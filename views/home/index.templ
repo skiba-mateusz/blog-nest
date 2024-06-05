@@ -1,0 +1,17 @@
+package home
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+
+type IndexData struct {
+    Title string
+}
+
+templ Index(data IndexData) {
+    @layouts.Base(data.Title) {
+        <section>
+            <div class="container">
+                <h1>Index Page</h1>
+            </div>
+        </section>
+    }
+}

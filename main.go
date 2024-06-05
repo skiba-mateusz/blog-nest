@@ -12,6 +12,9 @@ import (
 
 func main() {
 	router := chi.NewRouter()
+	
+	fs := http.FileServer(http.Dir("./static"))
+	router.Handle("/static/*", http.StripPrefix("/static/", fs))
 
 	homeHandler := handler.NewHomeHandler()
 
