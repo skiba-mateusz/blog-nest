@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/skiba-mateusz/blog-nest/config"
+	"github.com/skiba-mateusz/blog-nest/db"
 	"github.com/skiba-mateusz/blog-nest/handler"
 )
 
@@ -15,6 +15,14 @@ func main() {
 	
 	fs := http.FileServer(http.Dir("./static"))
 	router.Handle("/static/*", http.StripPrefix("/static/", fs))
+
+	db, err := db.NewPostgreSQLStorage()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	log.Println("DB connected")
+
 
 	homeHandler := handler.NewHomeHandler()
 
