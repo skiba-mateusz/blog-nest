@@ -1,0 +1,20 @@
+package components
+
+type InputProps struct {
+    Typ         string
+    Placeholder string
+    Label       string
+    Name        string
+    Error       string
+    Value       string
+}
+
+templ Input(props InputProps) {
+    <div class="form__group">
+        <label for={ props.Name }>{ props.Label }</label>
+        <input class="input" id={ props.Name } name={ props.Name } type={ props.Typ } value={ props.Value } placeholder={ props.Placeholder }/>
+        if len(props.Error) > 0 {
+            <div class="alert" role="alert">{ props.Error }</div>
+        }
+    </div>
+}

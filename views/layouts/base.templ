@@ -1,7 +1,8 @@
 package layouts
 
+import "github.com/skiba-mateusz/blog-nest/types"
 
-templ header() {
+templ header(user *types.User) {
     <header class="header">
         <div class="container">
             <div class="header__inner">
@@ -11,10 +12,17 @@ templ header() {
                     <box-icon class="search-box__icon" name="search"></box-icon>
                     <input class="search-box__input" id="search-box-input" type="search" placeholder="Search blogs"/>
                 </form>
-                <div class="group">
-                    <a class="btn btn--primary" href={templ.URL("/auth/login")}>Login</a>
-                    <a class="btn btn--secondary" href={templ.URL("/auth/register")}>Register</a>
-                </div>
+                if user != nil {
+                    <div class="group">
+                        <span>{ user.Username }</span>
+                        <a class="btn btn--secondary" href={ templ.URL("/user/logout") }>Logout</a>
+                    </div>
+                } else {
+                    <div class="group">
+                        <a class="btn btn--primary" href={templ.URL("/user/login")}>Login</a>
+                        <a class="btn btn--secondary" href={templ.URL("/user/register")}>Register</a>
+                    </div>
+                }
             </div>
         </div>
     </header>
@@ -24,7 +32,7 @@ templ nav() {
     <nav>Nav</nav>
 }
 
-templ Base(title string) {
+templ Base(title string, user *types.User) {
     <html>
         <head>
             <meta charset="utf-8">
@@ -38,7 +46,7 @@ templ Base(title string) {
             <script src="/static/js/script.js" defer></script>
         </head>
         <body>
-            @header() {
+            @header(user) {
                 @nav()
             }
             <main>

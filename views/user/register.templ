@@ -1,0 +1,71 @@
+package user
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "github.com/skiba-mateusz/blog-nest/types"
+
+
+type RegisterData struct {
+    Title           string
+    RegisterForm    *forms.Form
+    User            *types.User
+}
+
+type RegisterFormValues struct {
+    Username        string
+    Email           string
+    Password        string
+    PasswordRepeat  string
+}
+
+templ RegisterForm(form *forms.Form) {
+     <form hx-post="/user/register" hx-swap="outerHTML" class="form">
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Placeholder: "John",
+            Label: "Username",
+            Name: "username",
+            Error: form.Errors.Get("username"),
+            Value: form.Values.Get("username"),
+        })
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Placeholder: "john@email.com",
+            Label: "Email",
+            Name: "email",
+            Error: form.Errors.Get("email"),
+            Value: form.Values.Get("email"),
+        })
+        @components.Input(components.InputProps{
+            Typ: "password",
+            Placeholder: "Secret password",
+            Label: "Password",
+            Name: "password",
+            Error: form.Errors.Get("password"),
+            Value: "",
+        })
+        @components.Input(components.InputProps{
+            Typ: "password",
+            Placeholder: "Repeat secret password",
+            Label: "Repeat password",
+            Name: "password_repeat",
+            Error: form.Errors.Get("password_repeat"),
+            Value: "",
+        })
+        <button class="btn btn--secondary">Register</button>
+    </form>
+}
+
+templ Register(data RegisterData){
+    @layouts.Base(data.Title, data.User) {
+        <section>
+            <div class="container container--narrow">
+                <div class="panel">
+                    <h1 class="heading">Register</h1>
+                    @RegisterForm(data.RegisterForm)
+                </div>
+            </div>
+        </section>
+    }
+}

@@ -11,9 +11,11 @@ import "io"
 import "bytes"
 
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/types"
 
 type IndexData struct {
 	Title string
+	User  *types.User
 }
 
 func Index(data IndexData) templ.Component {
@@ -44,7 +46,7 @@ func Index(data IndexData) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layouts.Base(data.Title).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Base(data.Title, data.User).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

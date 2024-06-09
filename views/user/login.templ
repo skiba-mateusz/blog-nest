@@ -1,0 +1,47 @@
+package user
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "github.com/skiba-mateusz/blog-nest/types"
+
+type LoginData struct {
+    Title       string
+    LoginForm   *forms.Form
+    User        *types.User
+}
+
+templ LoginForm(form *forms.Form) {
+    <form class="form" hx-post="/user/login" hx-request='\"credentials\":"true"' hx-swap="outerHTML">
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Name: "email",
+            Label: "Email",
+            Placeholder: "john@example.com",
+            Value: form.Values.Get("email"),
+            Error: form.Errors.Get("email"),
+        })
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Name: "password",
+            Label: "Password",
+            Placeholder: "Your secret password",
+            Value: form.Values.Get("password"),
+            Error: form.Errors.Get("password"),
+        })
+        <button class="btn btn--secondary">Login</button>
+    </form>
+}
+
+templ Login(data LoginData){
+    @layouts.Base(data.Title, data.User) {
+        <section>
+            <div class="container container--narrow">
+                <div class="panel">
+                    <h1 class="heading">Login</h1>
+                    @LoginForm(data.LoginForm)
+                </div>
+            </div>
+        </section>
+    }
+}

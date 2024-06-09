@@ -1,13 +1,15 @@
 package home
 
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/types"
 
 type IndexData struct {
-    Title string
+    Title   string
+	User 	*types.User
 }
 
 templ Index(data IndexData) {
-    @layouts.Base(data.Title) {
+    @layouts.Base(data.Title, data.User) {
         <section>
             <div class="container">
                 <h1>Index Page</h1>
