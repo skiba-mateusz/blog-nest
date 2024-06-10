@@ -10,9 +10,9 @@ type IndexData struct {
 
 templ Index(data IndexData) {
     @layouts.Base(data.Title, data.User) {
-        <section>
+        <section class="my-24">
             <div class="container">
-                <h1>Index Page</h1>
+                <h1 class="heading">Index Page</h1>
             </div>
         </section>
     }

@@ -2,10 +2,10 @@ package user
 
 templ LoginRequiredModal() {
     <dialog class="modal">
-        <div class="grid-flow">
-            <h3 class="text-center">Login required</h3>
-            <a class="btn btn--primary" href={ templ.URL("/user/login") }>Login</a>
-            <a class="btn btn--secondary" href={ templ.URL("/user/register")}>Register</a>
+        <div class="flow">
+            <h3 class="text-center text-20">Login required</h3>
+            <a class="btn btn--full btn--primary" href={ templ.URL("/user/login") }>Login</a>
+            <a class="btn btn--full btn--secondary" href={ templ.URL("/user/register")}>Register</a>
         </div>
     </dialog>
     <script>

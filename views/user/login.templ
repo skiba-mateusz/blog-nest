@@ -12,7 +12,7 @@ type LoginData struct {
 }
 
 templ LoginForm(form *forms.Form) {
-    <form class="form" hx-post="/user/login" hx-request='\"credentials\":"true"' hx-swap="outerHTML">
+    <form class="grid" hx-post="/user/login" hx-swap="outerHTML">
         @components.Input(components.InputProps{
             Typ: "text",
             Name: "email",
@@ -35,9 +35,10 @@ templ LoginForm(form *forms.Form) {
 
 templ Login(data LoginData){
     @layouts.Base(data.Title, data.User) {
-        <section>
+        <section class="my-24">
             <div class="container container--narrow">
-                <div class="panel">
+                @components.GoBack()
+                <div class="panel flow">
                     <h1 class="heading">Login</h1>
                     @LoginForm(data.LoginForm)
                 </div>

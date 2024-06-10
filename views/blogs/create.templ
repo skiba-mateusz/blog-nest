@@ -23,7 +23,7 @@ func categoriesOptions(categories []types.Category) []components.OptionProps {
 }
 
 templ CreateBlogForm(categories []types.Category, form *forms.Form) {
-    <form id="create-blog-form" class="form" hx-post="/blog/create" hx-trigger="create-blog" hx-swap="outerHTML">
+    <form id="create-blog-form" class="grid" hx-post="/blog/create" hx-trigger="create-blog" hx-swap="outerHTML">
         <input id="create-blog-content" type="hidden" name="content">
         if len(form.Errors.Get("content")) > 0 {
             <p class="alert" role="alert">{ form.Errors.Get("content") }</p>
@@ -51,12 +51,13 @@ templ CreateBlogForm(categories []types.Category, form *forms.Form) {
 
 templ Create(data CreateData) {
     @layouts.Base(data.Title, data.User) {
-        <section>
+        <section class="my-24">
             <div class="container container--narrow">
-                <div class="panel">
+                @components.GoBack()
+                <div class="panel flow">
                     <h1 class="heading">Create blog</h1>
-                    <div class="form">
-                        <p>Blog content</p>
+                    <div class="grid" style="--grid-spacer: var(--size-8)">
+                        <span>Blog content</span>
                         <div>
                             <div id="editor"></div>
                         </div>

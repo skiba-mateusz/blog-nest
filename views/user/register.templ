@@ -20,7 +20,7 @@ type RegisterFormValues struct {
 }
 
 templ RegisterForm(form *forms.Form) {
-     <form hx-post="/user/register" hx-swap="outerHTML" class="form">
+     <form class="grid" hx-post="/user/register" hx-swap="outerHTML">
         @components.Input(components.InputProps{
             Typ: "text",
             Placeholder: "John",
@@ -59,9 +59,10 @@ templ RegisterForm(form *forms.Form) {
 
 templ Register(data RegisterData){
     @layouts.Base(data.Title, data.User) {
-        <section>
+        <section class="my-24">
             <div class="container container--narrow">
-                <div class="panel">
+                @components.GoBack()
+                <div class="panel flow">
                     <h1 class="heading">Register</h1>
                     @RegisterForm(data.RegisterForm)
                 </div>
