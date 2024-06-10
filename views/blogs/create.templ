@@ -1,0 +1,92 @@
+package blogs
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "strconv"
+
+type CreateData struct {
+    Title       string
+    BlogForm    *forms.Form
+    User        *types.User
+    Categories  []types.Category
+}
+
+func categoriesOptions(categories []types.Category) []components.OptionProps {
+    var c []components.OptionProps
+    for _, category := range categories {
+        strID := strconv.Itoa(category.ID)
+        c = append(c, components.OptionProps{Value: strID, Label: category.Name})
+    }
+    return c
+}
+
+templ CreateBlogForm(categories []types.Category, form *forms.Form) {
+    <form id="create-blog-form" class="form" hx-post="/blog/create" hx-trigger="create-blog" hx-swap="outerHTML">
+        <input id="create-blog-content" type="hidden" name="content">
+        if len(form.Errors.Get("content")) > 0 {
+            <p class="alert" role="alert">{ form.Errors.Get("content") }</p>
+        }
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Name: "title",
+            Label: "Title",
+            Placeholder: "Title",
+            Value: form.Values.Get("title"),
+            Error: form.Errors.Get("title"),
+        })
+        @components.Select(components.SelectProps{
+            Label: "Category",  
+            Name: "category",
+            Error: form.Errors.Get("category"),
+            SelectedValue: form.Values.Get("category"),
+            Placeholder: components.OptionProps{
+                Label: "Select category",
+            },
+            Options: categoriesOptions(categories),
+        })
+    </form>
+}
+
+templ Create(data CreateData) {
+    @layouts.Base(data.Title, data.User) {
+        <section>
+            <div class="container container--narrow">
+                <div class="panel">
+                    <h1 class="heading">Create blog</h1>
+                    <div class="form">
+                        <p>Blog content</p>
+                        <div>
+                            <div id="editor"></div>
+                        </div>
+                    </div>
+                    @CreateBlogForm(data.Categories, data.BlogForm)
+                    <button id="create-blog-btn" class="btn btn--full btn--secondary">Create Blog</button>
+                </div>
+            </div>
+        </section>
+        <script>
+            const toolbarOptions = [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],                     
+                [{ 'header': [2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }],          
+                [{ 'align': [] }],    
+                ['code-block'],                            
+            ];
+            const quill = new Quill('#editor', {
+                modules: {
+                    toolbar: toolbarOptions
+                },
+                theme: 'snow'
+            });
+            document.querySelector("#create-blog-btn").addEventListener("click", () => {
+                content = quill.getSemanticHTML()
+                document.querySelector("#create-blog-content").value = content
+                htmx.trigger(document.querySelector("#create-blog-form"), "create-blog")
+            })
+        </script>
+
+    }
+}

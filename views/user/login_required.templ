@@ -1,10 +1,15 @@
 package user
 
 templ LoginRequiredModal() {
-    <dialog open>
-    <p>Login required</p>
-    <form method="dialog">
-        <button>OK</button>
-    </form>
+    <dialog class="modal">
+        <div class="grid-flow">
+            <h3 class="text-center">Login required</h3>
+            <a class="btn btn--primary" href={ templ.URL("/user/login") }>Login</a>
+            <a class="btn btn--secondary" href={ templ.URL("/user/register")}>Register</a>
+        </div>
     </dialog>
+    <script>
+        document.querySelector("dialog").showModal()
+        document.body.style = "overflow: hidden"
+    </script>
 }

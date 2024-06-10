@@ -117,6 +117,11 @@ main {
   gap: var(--size-16);
 }
 
+.grid-flow {
+  display: grid;
+  gap: var(--size-16);
+}
+
 .panel {
   padding: var(--size-20);
   background-color: var(--clr-gray-50);
@@ -151,6 +156,41 @@ main {
   color: var(--clr-red-600);
 }
 
+.my-6 {
+  margin-block: var(--size-6);
+}
+.my-8 {
+  margin-block: var(--size-8);
+}
+.my-10 {
+  margin-block: var(--size-10);
+}
+.my-12 {
+  margin-block: var(--size-12);
+}
+.my-14 {
+  margin-block: var(--size-14);
+}
+.my-16 {
+  margin-block: var(--size-16);
+}
+.my-20 {
+  margin-block: var(--size-20);
+}
+.my-24 {
+  margin-block: var(--size-24);
+}
+.my-28 {
+  margin-block: var(--size-28);
+}
+.my-32 {
+  margin-block: var(--size-32);
+}
+
+.text-center {
+  text-align: center;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -171,6 +211,10 @@ main {
   .group {
     gap: var(--size-12);
   }
+
+  .gird-flow {
+    gap: var(--size-12);
+  }
 }
 
 /* Elements */
@@ -178,10 +222,15 @@ main {
 .btn {
   padding: var(--size-8) var(--size-12);
   font-weight: 500;
+  text-align: center;
   border-radius: var(--rounded-sm);
   border: none;
   transition: 200ms;
   cursor: pointer;
+}
+
+.btn--full {
+  width: 100%;
 }
 
 .btn--primary {
@@ -207,8 +256,30 @@ main {
   border-radius: var(--rounded-sm);
   outline: none;
 }
+
 .input:focus {
   border: 1px solid var(--clr-blue-500);
+}
+
+select {
+  padding: var(--size-8) var(--size-12);
+  background-color: var(--clr-gray-200);
+  border: none;
+  border-radius: var(--rounded-sm);
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24rem;
+  padding: var(--size-16);
+  border: none;
+  border-radius: var(--rounded-sm);
+  transform: translate(-50%, -50%);
+}
+.modal::backdrop {
+  backdrop-filter: blur(4px);
 }
 
 /* Blocks */
@@ -271,4 +342,13 @@ main {
 .form__group {
   display: grid;
   gap: var(--size-6);
+}
+
+/* Quill */
+
+#editor,
+#editor > div {
+  height: auto;
+  min-height: 12rem;
+  margin-bottom: var(--size-16);
 }

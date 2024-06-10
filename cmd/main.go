@@ -24,22 +24,25 @@ func main() {
 	log.Println("DB connected")
 
 	userStore := store.NewUserStore(db)
+	blogStore := store.NewBlogStore(db)
 
 	homeHandler := handler.NewHomeHandler(userStore)
 	userHandler := handler.NewUserHandler(userStore)
+	blogHandler := handler.NewBlogHanlder(userStore, blogStore)
 
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(auth.WithJWT(userStore))
 
 	router.Get("/", homeHandler.HandleIndex)
-
+	router.Get("/blog/create", blogHandler.HandleCreateShow)
 	router.Get("/user/register", userHandler.HandleRegisterShow)
 	router.Get("/user/login", userHandler.HandleLoginShow)
 	router.Get("/user/logout", userHandler.HandleLogout)
 
 	router.Post("/user/register", userHandler.HandleRegisterUser)
 	router.Post("/user/login", userHandler.HandleLoginUser)
+	router.Post("/blog/create", blogHandler.HandleCreateBlog)
 
 
 	fs := http.FileServer(http.Dir("./static"))

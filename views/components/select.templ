@@ -1,0 +1,41 @@
+package components
+
+type OptionProps struct {
+    Value   string
+    Label    string
+}
+
+type SelectProps struct {
+    Label       string
+    Name        string
+    Error       string
+    SelectedValue       string
+    Options     []OptionProps
+    Placeholder OptionProps
+}
+
+templ Option(props OptionProps, selectedValue string) {
+    if selectedValue == props.Value {
+        <option selected value={ props.Value }>{ props.Label }</option>
+    } 
+    else {
+        <option value={ props.Value }>{ props.Label }</option>
+    }
+}
+
+templ Select(props SelectProps) {
+    <div class="form__group">
+        <label for={ props.Name }> { props.Label }</label>
+        <select id={ props.Name } name={ props.Name } >
+            <option value="" selected disabled hidden>{ props.Placeholder.Label }</option>
+            if len(props.Options) > 0 {
+                for _, option := range props.Options {
+                    @Option(option, props.SelectedValue, )
+                }
+            }
+        </select>
+        if len(props.Error) > 0 {
+            <div class="alert" role="alert">{ props.Error }</div>
+        }
+    </div>
+}
