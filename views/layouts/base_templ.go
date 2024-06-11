@@ -25,7 +25,7 @@ func header(user *types.User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"header\"><div class=\"container\"><div class=\"header__inner\"><a class=\"header__logo\" href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"header\"><div class=\"container container--large\"><div class=\"header__inner\"><a class=\"header__logo\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

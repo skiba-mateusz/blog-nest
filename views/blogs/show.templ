@@ -1,0 +1,53 @@
+package blogs
+
+import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "time"
+
+type ShowData struct {
+    Title   string
+    Blog    *types.Blog
+    User    *types.User
+}
+
+func formatDate(date time.Time) string {
+    return date.Format("2006-01-02")
+}
+
+templ Show(data ShowData) {
+    @layouts.Base(data.Title, data.User) {
+        <article class="blog my-24">
+            <div class="container container--large">
+                @components.GoBack()
+                <header class="blog__header">
+                    <h1 class="blog__title">{ data.Blog.Title }</h1>
+                    <figure class="blog__img-wrapper backdrop">
+                        <img class="blog__img" src="/static/images/blog.jpg" alt={ data.Blog.Title }>
+                    </figure>
+                    <div class="blog__author panel flow">
+                        <h2 class="heading text-20 text-semi-bold">About author</h2>
+                        <span>{ data.Blog.User.Username }</span>
+                    </div>
+                </header>
+                <section class="container container--medium flow my-24">
+                    @templ.Raw(data.Blog.Content)
+                </section>
+                <footer class="blog__footer">
+                    <div class="reactions">
+                        <a class="reactions__btn reactions__btn-like">
+                            <box-icon name='like'></box-icon>
+                            <span class="sr-only">Like</span>
+                        </a>
+                        <span class="reactions__count">4</span>
+                        <a class="reactions__btn reactions__btn-dislike">
+                            <box-icon name='dislike' ></box-icon>
+                            <span class="sr-only">Dislike</span>
+                        </a>
+                    </div>
+                    <time>{ formatDate( data.Blog.CreatedAt) }</time>
+                </footer>
+            </div>
+        </article>
+    }
+}

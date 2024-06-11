@@ -4,7 +4,7 @@ import "github.com/skiba-mateusz/blog-nest/types"
 
 templ header(user *types.User) {
     <header class="header">
-        <div class="container">
+        <div class="container container--large">
             <div class="header__inner">
                 <a class="header__logo" href={ templ.URL("/") }>BlogNest</a>
                 <form class="search-box" role="search">

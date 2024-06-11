@@ -26,7 +26,7 @@ func main() {
 	userStore := store.NewUserStore(db)
 	blogStore := store.NewBlogStore(db)
 
-	homeHandler := handler.NewHomeHandler(userStore)
+	homeHandler := handler.NewHomeHandler(userStore, blogStore)
 	userHandler := handler.NewUserHandler(userStore)
 	blogHandler := handler.NewBlogHanlder(userStore, blogStore)
 
@@ -36,6 +36,7 @@ func main() {
 
 	router.Get("/", homeHandler.HandleIndex)
 	router.Get("/blog/create", blogHandler.HandleCreateShow)
+	router.Get("/blog/{blogID}", blogHandler.HandleBlogShow)
 	router.Get("/user/register", userHandler.HandleRegisterShow)
 	router.Get("/user/login", userHandler.HandleLoginShow)
 	router.Get("/user/logout", userHandler.HandleLogout)

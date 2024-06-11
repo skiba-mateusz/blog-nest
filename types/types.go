@@ -34,5 +34,7 @@ type UserStore interface {
 
 type BlogStore interface {
 	GetCategories() ([]Category, error)
+	GetBlogs() ([]Blog, error)
+	GetBlogByID(id int) (*Blog, error)
 	CreateBlog(blog Blog) (int, error)
 }
