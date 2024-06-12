@@ -135,6 +135,14 @@ p[role="alert"] {
   border-radius: var(--rounded-sm);
 }
 
+hr {
+  background-color: var(--clr-gray-300);
+  height: 2px;
+  width: 100%;
+  margin-block: var(--size-4);
+  border: none;
+}
+
 /* Elements */
 
 .btn {
@@ -142,6 +150,7 @@ p[role="alert"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent;
   font-weight: var(--fw-semi-bold);
   text-align: center;
   border-radius: var(--rounded-sm);
@@ -153,6 +162,15 @@ p[role="alert"] {
 .btn--full {
   display: block;
   width: 100%;
+}
+
+.btn--rounded {
+  padding: var(--size-12);
+  border-radius: 100%;
+  aspect-ratio: 1/1;
+}
+.btn--rounded:hover {
+  background-color: var(--clr-gray-200);
 }
 
 .btn--go-back {
@@ -254,6 +272,10 @@ p[role="alert"] {
   border: 2px solid var(--clr-gray-300);
 }
 
+.nav__link.nav__link--active {
+  color: var(--clr-blue-600);
+}
+
 .blog-preview {
   --title-size: var(--fs-40);
 }
@@ -336,6 +358,7 @@ p[role="alert"] {
 }
 
 .reactions {
+  padding: var(--size-4);
   display: flex;
   align-items: center;
   gap: var(--size-8);
@@ -360,6 +383,42 @@ p[role="alert"] {
 
 .reactions__btn-dislike.reactions__btn-dislike--active {
   fill: var(--clr-red-600);
+}
+
+.menu {
+  position: relative;
+}
+.menu.menu--active .menu__list {
+  display: block;
+}
+.menu.menu--active .menu__trigger {
+  background-color: var(--clr-gray-200);
+}
+
+.menu__header {
+  padding: var(--size-8) var(--size-16);
+}
+
+.menu__list {
+  position: absolute;
+  top: calc(100% + var(--size-8));
+  right: 0;
+  padding: var(--size-4);
+  background-color: var(--clr-gray-50);
+  border: 1px solid var(--clr-gray-300);
+  border-radius: var(--rounded-sm);
+  display: none;
+  z-index: 10;
+}
+
+.menu__item {
+  padding: var(--size-8) var(--size-16);
+  border-radius: var(--rounded-sm);
+  display: block;
+}
+
+.menu__item:hover {
+  background-color: var(--clr-gray-200);
 }
 
 .avatar {
@@ -435,7 +494,7 @@ p[role="alert"] {
   z-index: 1;
 }
 
-.group {
+.flex-group {
   display: flex;
   align-items: center;
   gap: var(--grou-spacer, var(--size-16));
@@ -510,6 +569,9 @@ p[role="alert"] {
   margin-inline: auto;
 }
 
+.my-16 {
+  margin-block: var(--size-16);
+}
 .my-24 {
   margin-block: var(--size-24);
 }

@@ -54,7 +54,7 @@ func Reactions(likes *types.BlogLikes, blogID int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 = []any{"reactions__btn reactions__btn-like", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
+		var templ_7745c5c3_Var2 = []any{"reactions__btn reactions__btn-like btn btn--rounded", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -91,7 +91,7 @@ func Reactions(likes *types.BlogLikes, blogID int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><box-icon name=\"like\"></box-icon> <span class=\"sr-only\">Like</span></button> <span class=\"reactions__count\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><box-icon name=\"like\" type=\"solid\"></box-icon> <span class=\"sr-only\">Like</span></button> <span class=\"reactions__count\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -108,7 +108,7 @@ func Reactions(likes *types.BlogLikes, blogID int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 = []any{"reactions__btn reactions__btn-dislike", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
+		var templ_7745c5c3_Var5 = []any{"reactions__btn reactions__btn-dislike btn btn--rounded", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -145,7 +145,7 @@ func Reactions(likes *types.BlogLikes, blogID int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><box-icon name=\"dislike\"></box-icon> <span class=\"sr-only\">Dislike</span></button></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><box-icon name=\"dislike\" type=\"solid\"></box-icon> <span class=\"sr-only\">Dislike</span></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -222,7 +222,7 @@ func Show(data ShowData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div></header><section class=\"container container--medium flow my-24\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div></header><hr class=\"my-16\"><section class=\"container container--medium flow my-24\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -230,7 +230,7 @@ func Show(data ShowData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><footer class=\"blog__footer\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><hr class=\"my-16\"><footer class=\"blog__footer\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -245,7 +245,7 @@ func Show(data ShowData) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(data.Blog.CreatedAt))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/show.templ`, Line: 86, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/show.templ`, Line: 88, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {

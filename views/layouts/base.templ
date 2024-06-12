@@ -2,6 +2,37 @@ package layouts
 
 import "github.com/skiba-mateusz/blog-nest/types"
 
+templ userMenu(user *types.User) {
+    <div class="menu">
+        <button id="user-menu-trigger" class="menu__trigger btn btn--rounded" aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu-list">
+            <span class="sr-only">User menu</span>
+            <box-icon name='user'></box-icon>
+        </button>
+        <div id="user-menu-list" class="menu__list" aria-labeledby="user-menu-trigger" role="menu">
+            <header class="menu__header">
+                <span class="text-medium">{ user.Email }</span>
+            </header>
+            <hr/>
+            <a href={ templ.URL("/user/profile") } class="menu__item" role="menuitem">Profile</a>
+            <a href={ templ.URL("/user/logout") } class="menu__item" role="menuitem">Logout</a>
+        </div>
+    </div>
+}
+
+
+templ nav() {
+    <nav class="nav">
+        <ul class="flex-group">
+            <li>
+                <a href={ templ.URL("/") } class="nav__link text-medium">Home</a>
+            </li>
+            <li>
+                <a href={ templ.URL("/blog/create") } class="nav__link text-medium">Write blog</a>
+            </li> 
+        </ul>
+    </nav>
+}
+
 templ header(user *types.User) {
     <header class="header">
         <div class="container container--large">
@@ -12,13 +43,11 @@ templ header(user *types.User) {
                     <box-icon class="search-box__icon" name="search"></box-icon>
                     <input class="search-box__input" id="search-box-input" type="search" placeholder="Search blogs"/>
                 </form>
+                @nav()
                 if user != nil {
-                    <div class="group">
-                        <span>{ user.Username }</span>
-                        <a class="btn btn--secondary" href={ templ.URL("/user/logout") }>Logout</a>
-                    </div>
+                    @userMenu(user)
                 } else {
-                    <div class="group">
+                    <div class="flex-group">
                         <a class="btn btn--primary" href={templ.URL("/user/login")}>Login</a>
                         <a class="btn btn--secondary" href={templ.URL("/user/register")}>Register</a>
                     </div>
@@ -26,10 +55,6 @@ templ header(user *types.User) {
             </div>
         </div>
     </header>
-}
-
-templ nav() {
-    <nav>Nav</nav>
 }
 
 templ Base(title string, user *types.User) {
@@ -50,9 +75,7 @@ templ Base(title string, user *types.User) {
             <script src="/static/js/script.js" defer></script>
         </head>
         <body>
-            @header(user) {
-                @nav()
-            }
+            @header(user) 
             <main>
             { children... }
             </main>

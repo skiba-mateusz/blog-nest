@@ -39,9 +39,9 @@ templ Reactions(likes *types.BlogLikes, blogID int) {
         }
         hx-target="#reactions"
         hx-swap="outerHTML"
-        class={"reactions__btn reactions__btn-like", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
+        class={"reactions__btn reactions__btn-like btn btn--rounded", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
     >
-        <box-icon name='like'></box-icon>
+        <box-icon name='like' type='solid'></box-icon>
         <span class="sr-only">Like</span>
     </button>
     <span class="reactions__count">{ strconv.Itoa(likes.Count) }</span>
@@ -54,9 +54,9 @@ templ Reactions(likes *types.BlogLikes, blogID int) {
         }
         hx-target="#reactions"
         hx-swap="outerHTML"
-        class={"reactions__btn reactions__btn-dislike", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
+        class={"reactions__btn reactions__btn-dislike btn btn--rounded", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
     >
-        <box-icon name='dislike'></box-icon>
+        <box-icon name='dislike' type='solid'></box-icon>
         <span class="sr-only">Dislike</span>
     </button>
 </div>
@@ -78,9 +78,11 @@ templ Show(data ShowData) {
                         <span>{ data.Blog.User.Username }</span>
                     </div>
                 </header>
+                <hr class="my-16"/>
                 <section class="container container--medium flow my-24">
                     @templ.Raw(data.Blog.Content)
                 </section>
+                <hr class="my-16"/>
                 <footer class="blog__footer">
                     @Reactions(data.Blog.Likes, data.Blog.ID)
                     <time>{ formatDate( data.Blog.CreatedAt) }</time>
