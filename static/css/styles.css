@@ -27,6 +27,9 @@
   --clr-red-600: rgb(220 38 38);
   --clr-red-950: rgb(69 10 10);
 
+  --clr-green-500: rgb(34 197 94);
+  --clr-green-600: rgb(22 163 74);
+
   --fs-14: 0.875rem;
   --fs-15: 0.935rem;
   --fs-16: 1rem;
@@ -346,6 +349,17 @@ p[role="alert"] {
 
 .reactions__btn {
   padding: var(--size-8);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.reactions__btn.reactions__btn-like--active {
+  fill: var(--clr-green-600);
+}
+
+.reactions__btn-dislike.reactions__btn-dislike--active {
+  fill: var(--clr-red-600);
 }
 
 .avatar {

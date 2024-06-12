@@ -2,6 +2,11 @@ package user
 
 templ LoginRequiredModal() {
     <dialog class="modal">
+        <form method="dialog">
+            <button>
+                <box-icon name='x'></box-icon>
+            </button>
+        </form>
         <div class="flow">
             <h3 class="text-center text-20">Login required</h3>
             <a class="btn btn--full btn--primary" href={ templ.URL("/user/login") }>Login</a>

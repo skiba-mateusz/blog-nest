@@ -46,14 +46,27 @@ func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
 	str := chi.URLParam(r, "blogID")
 	blogID, _ := strconv.Atoi(str)
 
+	var userID int
+	user, ok := auth.GetUserFromContext(r.Context())
+	if !ok {
+		userID = 0
+	} else {
+		userID = user.ID
+	}
+
 	blog, err := h.blogStore.GetBlogByID(blogID)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
 	}
-
-	user, _ := auth.GetUserFromContext(r.Context())
+	blogLikes, err := h.blogStore.GetBlogLikes(userID, blog.ID)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
 	
+	blog.Likes = blogLikes
+
 	utils.Render(w, blogs.Show(blogs.ShowData{
 		Title: "Blog | BlogNest",
 		Blog: blog,
@@ -62,11 +75,6 @@ func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		utils.ClientError(w, "invalid form data", http.StatusBadRequest)
-		return
-	}
-
 	categories, err := h.blogStore.GetCategories()
 	if err != nil {
 		utils.ServerError(w, err)
@@ -110,4 +118,78 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("HX-Redirect", fmt.Sprintf("/blog/%d", blogID))
+}
+
+func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
+	blogID, value, err := parseLikeRequest(r)
+	if err != nil {
+		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
+		return
+	}
+
+	user, ok := auth.GetUserFromContext(r.Context())
+	if !ok {
+		blogLikes, err := h.blogStore.GetBlogLikes(0, blogID)
+		if err != nil {
+			utils.ServerError(w, err)
+			return
+		}
+		utils.Render(w, blogs.Reactions(blogLikes, blogID))
+		auth.PermissionDenied(w, r)
+		return
+	}
+
+	err = h.blogStore.CreateLike(user.ID, blogID, value)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+	blogLikes, err := h.blogStore.GetBlogLikes(user.ID, blogID)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	utils.Render(w, blogs.Reactions(blogLikes, blogID))
+}
+
+func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
+	blogID, value, err := parseLikeRequest(r)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	user, ok := auth.GetUserFromContext(r.Context())
+	if !ok {
+		auth.PermissionDenied(w, r)
+		return
+	}
+
+	err = h.blogStore.UpdateLike(user.ID, blogID, value)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+	blogLikes, err := h.blogStore.GetBlogLikes(user.ID, blogID)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	utils.Render(w, blogs.Reactions(blogLikes, blogID))
+}
+
+func parseLikeRequest(r *http.Request) (int, int, error) {
+	if err := r.ParseForm(); err != nil {
+		return 0, 0, err
+	}
+
+	str := chi.URLParam(r, "blogID")
+	blogID, _ := strconv.Atoi(str)
+
+	valueStr := r.PostForm.Get("value")
+	value, _ := strconv.Atoi(valueStr)
+
+	return blogID, value, nil
 }

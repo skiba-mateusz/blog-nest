@@ -4,6 +4,8 @@ import "github.com/skiba-mateusz/blog-nest/types"
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
 import "github.com/skiba-mateusz/blog-nest/views/components"
 import "time"
+import "fmt"
+import "strconv"
 
 type ShowData struct {
     Title   string
@@ -14,6 +16,52 @@ type ShowData struct {
 func formatDate(date time.Time) string {
     return date.Format("2006-01-02")
 }
+
+func method(likes *types.BlogLikes, blogID int) templ.Attributes {
+    method := ""
+    if likes.UserLiked {
+        method = "hx-put"
+    } else {
+        method = "hx-post"
+    }
+    return templ.Attributes{method: fmt.Sprintf("/blog/%d/like", blogID) }
+}
+
+
+templ Reactions(likes *types.BlogLikes, blogID int) {
+ <div id="reactions" class="reactions">
+    <button 
+        { method(likes, blogID)... }
+        if likes.UserLikeValue == 0 || likes.UserLikeValue == -1 {
+            hx-vals='{"value": 1}'
+        } else {
+            hx-vals='{"value": 0}'
+        }
+        hx-target="#reactions"
+        hx-swap="outerHTML"
+        class={"reactions__btn reactions__btn-like", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
+    >
+        <box-icon name='like'></box-icon>
+        <span class="sr-only">Like</span>
+    </button>
+    <span class="reactions__count">{ strconv.Itoa(likes.Count) }</span>
+    <button
+        { method(likes, blogID)... }
+        if likes.UserLikeValue == 0 || likes.UserLikeValue == 1 {
+            hx-vals='{"value": -1}'
+        } else {
+            hx-vals='{"value": 0}'
+        }
+        hx-target="#reactions"
+        hx-swap="outerHTML"
+        class={"reactions__btn reactions__btn-dislike", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
+    >
+        <box-icon name='dislike'></box-icon>
+        <span class="sr-only">Dislike</span>
+    </button>
+</div>
+}
+
 
 templ Show(data ShowData) {
     @layouts.Base(data.Title, data.User) {
@@ -34,17 +82,7 @@ templ Show(data ShowData) {
                     @templ.Raw(data.Blog.Content)
                 </section>
                 <footer class="blog__footer">
-                    <div class="reactions">
-                        <a class="reactions__btn reactions__btn-like">
-                            <box-icon name='like'></box-icon>
-                            <span class="sr-only">Like</span>
-                        </a>
-                        <span class="reactions__count">4</span>
-                        <a class="reactions__btn reactions__btn-dislike">
-                            <box-icon name='dislike' ></box-icon>
-                            <span class="sr-only">Dislike</span>
-                        </a>
-                    </div>
+                    @Reactions(data.Blog.Likes, data.Blog.ID)
                     <time>{ formatDate( data.Blog.CreatedAt) }</time>
                 </footer>
             </div>

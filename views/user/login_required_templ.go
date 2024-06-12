@@ -23,7 +23,7 @@ func LoginRequiredModal() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<dialog class=\"modal\"><div class=\"flow\"><h3 class=\"text-center text-20\">Login required</h3><a class=\"btn btn--full btn--primary\" href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<dialog class=\"modal\"><form method=\"dialog\"><button><box-icon name=\"x\"></box-icon></button></form><div class=\"flow\"><h3 class=\"text-center text-20\">Login required</h3><a class=\"btn btn--full btn--primary\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

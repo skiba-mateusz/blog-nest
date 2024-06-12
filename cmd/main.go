@@ -44,6 +44,9 @@ func main() {
 	router.Post("/user/register", userHandler.HandleRegisterUser)
 	router.Post("/user/login", userHandler.HandleLoginUser)
 	router.Post("/blog/create", blogHandler.HandleCreateBlog)
+	router.Post("/blog/{blogID}/like", blogHandler.HandleCreateLike)
+
+	router.Put("/blog/{blogID}/like", blogHandler.HandleUpdateLike)
 
 
 	fs := http.FileServer(http.Dir("./static"))
