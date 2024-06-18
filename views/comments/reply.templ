@@ -1,0 +1,18 @@
+package comments
+
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "fmt"
+import "strconv"
+
+templ Reply(form *forms.Form, blogID, parentID int) {
+    <form class="create-comment hidden" hx-post={ fmt.Sprintf("/blog/%d/comment", blogID) } hx-target={ fmt.Sprintf("#comment-%d", parentID) } hx-swap="beforened">
+        <input type="hidden" name="parent_id" value={ strconv.Itoa(parentID) }/>
+        <textarea class="create-comment__content" name="content" placeholder="Reply">{ form.Values.Get("content") }</textarea>
+        if len(form.Errors.Get("content")) > 0 {
+            <p role="alert">{ form.Errors.Get("content") }</p>
+        }
+        <button class="create-comment__btn btn btn--rounded">
+            <box-icon type='solid' name='send'></box-icon>
+        </button>
+    </form>
+}

@@ -1,0 +1,13 @@
+package comments 
+
+import "github.com/skiba-mateusz/blog-nest/types"
+
+templ List(comments []types.Comment) {
+    <ul class="comments-list grid" style="--grid-spacer: var(--size-24)">
+        if len(comments) > 0 {
+            for _, comment := range comments {
+                @Comment(&comment, comment.Replies)
+            }
+        }
+    </ul>
+}

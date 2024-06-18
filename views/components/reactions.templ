@@ -1,0 +1,50 @@
+package components
+
+import "github.com/skiba-mateusz/blog-nest/types"
+import "fmt"
+import "strconv"
+
+func method(likes *types.Likes, resource string, id int) templ.Attributes {
+    method := ""
+    if likes.UserLiked {
+        method = "hx-put"
+    } else {
+        method = "hx-post"
+    }
+    return templ.Attributes{method: fmt.Sprintf("/%s/%d/like", resource, id) }
+}
+
+
+templ Reactions(likes *types.Likes, resource string, id int) {
+ <div class="reactions ml-auto">
+    <button 
+        { method(likes, resource, id)... }
+        if likes.UserLikeValue == 0 || likes.UserLikeValue == -1 {
+            hx-vals='{"value": 1}'
+        } else {
+            hx-vals='{"value": 0}'
+        }
+        hx-target="closest div"
+        hx-swap="outerHTML"
+        class={"reactions__btn reactions__btn-like btn btn--rounded", templ.KV("reactions__btn-like--active", likes.UserLikeValue == 1)}
+    >
+        <box-icon name='like' type='solid'></box-icon>
+        <span class="sr-only">Like</span>
+    </button>
+    <span class="reactions__count">{ strconv.Itoa(likes.Count) }</span>
+    <button
+        { method(likes, resource, id)... }
+        if likes.UserLikeValue == 0 || likes.UserLikeValue == 1 {
+            hx-vals='{"value": -1}'
+        } else {
+            hx-vals='{"value": 0}'
+        }
+        hx-target="closest div"
+        hx-swap="outerHTML"
+        class={"reactions__btn reactions__btn-dislike btn btn--rounded", templ.KV("reactions__btn-dislike--active", likes.UserLikeValue == -1)}
+    >
+        <box-icon name='dislike' type='solid'></box-icon>
+        <span class="sr-only">Dislike</span>
+    </button>
+</div>
+}

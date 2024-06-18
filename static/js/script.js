@@ -53,6 +53,10 @@ const controlHighlightActiveNavLink = () => {
   });
 };
 
+const openCommentReply = (e) => {
+  e.target.closest("button").nextElementSibling.classList.toggle("hidden");
+};
+
 const init = () => {
   controlHighlightActiveNavLink();
   controlRemoveModal();

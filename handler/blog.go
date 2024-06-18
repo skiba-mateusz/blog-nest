@@ -11,17 +11,20 @@ import (
 	"github.com/skiba-mateusz/blog-nest/types"
 	"github.com/skiba-mateusz/blog-nest/utils"
 	"github.com/skiba-mateusz/blog-nest/views/blogs"
+	"github.com/skiba-mateusz/blog-nest/views/components"
 )
 
 type blogHandler struct {
-	userStore types.UserStore
-	blogStore types.BlogStore
+	userStore 		types.UserStore
+	blogStore 		types.BlogStore
+	commentStore 	types.CommentStore
 }
 
-func NewBlogHanlder(userStore types.UserStore, blogStore types.BlogStore) *blogHandler {
+func NewBlogHanlder(userStore types.UserStore, blogStore types.BlogStore, commentStore types.CommentStore) *blogHandler {
 	return &blogHandler{
 		userStore: userStore,
 		blogStore: blogStore,
+		commentStore: commentStore,
 	}
 }
 
@@ -64,13 +67,21 @@ func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
 		utils.ServerError(w, err)
 		return
 	}
-	
+	comments, err := h.commentStore.GetCommentsByBlogID(blog.ID, userID)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	groupedComments := groupComments(comments, 0)
 	blog.Likes = blogLikes
 
 	utils.Render(w, blogs.Show(blogs.ShowData{
 		Title: "Blog | BlogNest",
 		Blog: blog,
+		Comments: groupedComments,
 		User: user,
+		CommentForm: &forms.Form{},
 	}))
 }
 
@@ -134,7 +145,7 @@ func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
 			utils.ServerError(w, err)
 			return
 		}
-		utils.Render(w, blogs.Reactions(blogLikes, blogID))
+		utils.Render(w, components.Reactions(blogLikes, "blog", blogID))
 		auth.PermissionDenied(w, r)
 		return
 	}
@@ -150,7 +161,7 @@ func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Render(w, blogs.Reactions(blogLikes, blogID))
+	utils.Render(w, components.Reactions(blogLikes, "blog", blogID))
 }
 
 func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
@@ -177,7 +188,7 @@ func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Render(w, blogs.Reactions(blogLikes, blogID))
+	utils.Render(w, components.Reactions(blogLikes, "blog", blogID))
 }
 
 func parseLikeRequest(r *http.Request) (int, int, error) {

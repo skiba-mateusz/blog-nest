@@ -25,10 +25,12 @@ func main() {
 
 	userStore := store.NewUserStore(db)
 	blogStore := store.NewBlogStore(db)
+	commentStore := store.NewCommentStore(db)
 
-	homeHandler := handler.NewHomeHandler(userStore, blogStore)
 	userHandler := handler.NewUserHandler(userStore)
-	blogHandler := handler.NewBlogHanlder(userStore, blogStore)
+	commentHandler := handler.NewCommentHandler(commentStore)
+	homeHandler := handler.NewHomeHandler(userStore, blogStore)
+	blogHandler := handler.NewBlogHanlder(userStore, blogStore, commentStore)
 
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
@@ -45,9 +47,11 @@ func main() {
 	router.Post("/user/login", userHandler.HandleLoginUser)
 	router.Post("/blog/create", blogHandler.HandleCreateBlog)
 	router.Post("/blog/{blogID}/like", blogHandler.HandleCreateLike)
+	router.Post("/comment/{commentID}/like", commentHandler.HandleCreateLike)
+	router.Post("/blog/{blogID}/comment", commentHandler.HandleCreateComment)
 
 	router.Put("/blog/{blogID}/like", blogHandler.HandleUpdateLike)
-
+	router.Put("/comment/{commentID}/like", commentHandler.HandleUpdateLike)
 
 	fs := http.FileServer(http.Dir("./static"))
 	router.Handle("/static/*", http.StripPrefix("/static/", fs))

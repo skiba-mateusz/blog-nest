@@ -23,11 +23,22 @@ type Blog struct {
 	Content		string
 	Category	Category
 	User		User
-	Likes		*BlogLikes
+	Likes		*Likes
 	CreatedAt	time.Time
 }
 
-type BlogLikes struct {
+type Comment struct {
+	ID			int
+	Content		string
+	ParentID	int
+	User 		User
+	Blog		Blog
+	Likes 		Likes
+	Replies 	[]Comment
+	CreatedAt	time.Time
+}
+
+type Likes struct {
 	Count			int
 	UserLiked		bool 
 	UserLikeValue 	int
@@ -46,5 +57,13 @@ type BlogStore interface {
 	CreateBlog(blog Blog) (int, error)
 	CreateLike(userID, blogID, value int) (error)
 	UpdateLike(userID, blogID, value int) (error)
-	GetBlogLikes(userID, blogID int) (*BlogLikes, error) 
+	GetBlogLikes(userID, blogID int) (*Likes, error) 
+}
+
+type CommentStore interface {
+	CreateComment(comment Comment) (int, error)
+	GetCommentsByBlogID(blogID, userID int) ([]Comment, error)
+	GetCommentLikes(commentID, userID int) (*Likes, error)
+	CreateLike(value, commentID, userID int) (error)
+	UpdateLike(value, commentID, userID int) (error)
 }

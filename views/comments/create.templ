@@ -1,0 +1,14 @@
+package comments
+
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "fmt"
+
+templ Create(form *forms.Form, blogID int) {
+    <form class="create-comment" hx-post={ fmt.Sprintf("/blog/%d/comment", blogID) } hx-target="next" hx-swap="afterbegin">
+        <input type="hidden" name="parent_id" value="0"  />
+        <textarea class="create-comment__content" name="content" placeholder="Add coment">{ form.Values.Get("content") }</textarea>
+        <button class="create-comment__btn btn btn--rounded">
+            <box-icon type='solid' name='send'></box-icon>
+        </button>
+    </form>
+}

@@ -159,6 +159,10 @@ hr {
   cursor: pointer;
 }
 
+.btn--small {
+  padding: var(--size-8) var(--size-12);
+}
+
 .btn--full {
   display: block;
   width: 100%;
@@ -193,10 +197,11 @@ hr {
 
 .btn--secondary {
   background-color: var(--clr-blue-400);
-  color: var(--clr-blue-950);
+  color: var(--clr-blue-50);
+  fill: var(--clr-blue-50);
 }
 .btn--secondary:hover {
-  background-color: var(--clr-blue-300);
+  background-color: var(--clr-blue-500);
 }
 
 .input {
@@ -361,7 +366,7 @@ hr {
   padding: var(--size-4);
   display: flex;
   align-items: center;
-  gap: var(--size-8);
+  gap: var(--size-4);
   border: 1px solid var(--clr-gray-300);
   border-radius: 100vh;
 }
@@ -421,18 +426,35 @@ hr {
   background-color: var(--clr-gray-200);
 }
 
-.avatar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--size-16);
+.create-comment {
+  position: relative;
 }
 
-.profile-preview__img {
-  width: 4rem;
-  height: 4rem;
+.create-comment__content {
+  padding: var(--size-16);
+  width: 100%;
+  border-radius: var(--rounded-sm);
+  background-color: var(--clr-gray-50);
+  border: 1px solid var(--clr-gray-300);
+  outline: none;
+  resize: none;
+}
+
+.create-comment__btn {
+  position: absolute;
+  inset: var(--size-12) var(--size-12) var(--size-12) auto;
+}
+
+.comments-list ul:where(:not(:first-child)) {
+  padding-left: 2rem;
+  border-left: 2px solid var(--clr-gray-300);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
   border-radius: 100%;
+  border: 2px solid var(--clr-blue-500);
 }
 
 @media (max-width: 50em) {
@@ -498,6 +520,7 @@ hr {
   display: flex;
   align-items: center;
   gap: var(--grou-spacer, var(--size-16));
+  flex-wrap: wrap;
 }
 
 .flow > *:not(:last-child) {
@@ -565,8 +588,15 @@ hr {
   font-weight: var(--fw-semi-bold);
 }
 
+.text-gray-600 {
+  color: var(--clr-gray-600);
+}
+
 .mx-auto {
   margin-inline: auto;
+}
+.ml-auto {
+  margin-left: auto;
 }
 
 .my-16 {
@@ -589,6 +619,16 @@ hr {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 30em) {
+  .panel {
+    padding: var(--size-16);
+  }
 }
 
 /* Quill */

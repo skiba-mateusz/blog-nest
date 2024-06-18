@@ -120,11 +120,11 @@ func (s *blogStore) CreateBlog(blog types.Blog) (int, error) {
 	return id, nil
 }
 
-func (s *blogStore) GetBlogLikes(userID, blogID int) (*types.BlogLikes, error) {
+func (s *blogStore) GetBlogLikes(userID, blogID int) (*types.Likes, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5) 
 	defer cancel()
 
-	blogLikes := new(types.BlogLikes)
+	likes := new(types.Likes)
 	row := s.db.QueryRowContext(ctx, `
 		SELECT 
 			COALESCE(sum(value),0) AS likes_count, 
@@ -137,12 +137,12 @@ func (s *blogStore) GetBlogLikes(userID, blogID int) (*types.BlogLikes, error) {
 		WHERE blog_id = $1
 		`, blogID, userID,
 	)
-	err := row.Scan(&blogLikes.Count, &blogLikes.UserLiked, &blogLikes.UserLikeValue)
+	err := row.Scan(&likes.Count, &likes.UserLiked, &likes.UserLikeValue)
 	if err != nil {
 		return nil, err
 	}
 
-	return blogLikes, nil
+	return likes, nil
 }
 
 func (s *blogStore) CreateLike(userID, blogID, value int) error {
