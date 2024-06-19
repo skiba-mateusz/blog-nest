@@ -93,7 +93,6 @@ func (h *userHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-
 	form.Required("email", "password")
 	form.Email("email")
 

@@ -159,10 +159,6 @@ hr {
   cursor: pointer;
 }
 
-.btn--small {
-  padding: var(--size-8) var(--size-12);
-}
-
 .btn--full {
   display: block;
   width: 100%;
@@ -202,6 +198,10 @@ hr {
 }
 .btn--secondary:hover {
   background-color: var(--clr-blue-500);
+}
+
+.btn--small {
+  padding: var(--size-8) var(--size-12);
 }
 
 .input {
@@ -446,7 +446,7 @@ hr {
 }
 
 .comments-list ul:where(:not(:first-child)) {
-  padding-left: 2rem;
+  padding-left: clamp(0.4rem, 2.5vw, 2rem);
   border-left: 2px solid var(--clr-gray-300);
 }
 

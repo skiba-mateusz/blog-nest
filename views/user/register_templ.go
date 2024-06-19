@@ -47,7 +47,7 @@ func RegisterForm(form *forms.Form) templ.Component {
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
 			Typ:         "text",
-			Placeholder: "John",
+			Placeholder: "Username...",
 			Label:       "Username",
 			Name:        "username",
 			Error:       form.Errors.Get("username"),
@@ -58,7 +58,7 @@ func RegisterForm(form *forms.Form) templ.Component {
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
 			Typ:         "text",
-			Placeholder: "john@email.com",
+			Placeholder: "Email...",
 			Label:       "Email",
 			Name:        "email",
 			Error:       form.Errors.Get("email"),
@@ -69,7 +69,7 @@ func RegisterForm(form *forms.Form) templ.Component {
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
 			Typ:         "password",
-			Placeholder: "Secret password",
+			Placeholder: "Password...",
 			Label:       "Password",
 			Name:        "password",
 			Error:       form.Errors.Get("password"),
@@ -80,7 +80,7 @@ func RegisterForm(form *forms.Form) templ.Component {
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
 			Typ:         "password",
-			Placeholder: "Repeat secret password",
+			Placeholder: "Repeat password...",
 			Label:       "Repeat password",
 			Name:        "password_repeat",
 			Error:       form.Errors.Get("password_repeat"),

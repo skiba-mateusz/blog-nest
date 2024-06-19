@@ -46,38 +46,30 @@ func (h *blogHandler) HandleCreateShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
-	str := chi.URLParam(r, "blogID")
-	blogID, _ := strconv.Atoi(str)
-
-	var userID int
-	user, ok := auth.GetUserFromContext(r.Context())
-	if !ok {
-		userID = 0
-	} else {
-		userID = user.ID
+	blogID, err := strconv.Atoi(chi.URLParam(r, "blogID"))
+	if err != nil {
+		utils.ClientError(w, "Invalid blog ID", http.StatusBadRequest)
+		return
 	}
 
-	blog, err := h.blogStore.GetBlogByID(blogID)
+	user, _ := auth.GetUserFromContext(r.Context())
+
+	blog, err := h.blogStore.GetBlogByID(blogID, user.ID)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
 	}
-	blogLikes, err := h.blogStore.GetBlogLikes(userID, blog.ID)
-	if err != nil {
-		utils.ServerError(w, err)
-		return
-	}
-	comments, err := h.commentStore.GetCommentsByBlogID(blog.ID, userID)
+
+	comments, err := h.commentStore.GetCommentsByBlogID(blog.ID, user.ID)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
 	}
 
 	groupedComments := groupComments(comments, 0)
-	blog.Likes = blogLikes
 
-	utils.Render(w, blogs.Show(blogs.ShowData{
-		Title: "Blog | BlogNest",
+	utils.Render(w, blogs.Index(blogs.IndexData{
+		Title: fmt.Sprintf("%s | BlogNest", blog.Title),
 		Blog: blog,
 		Comments: groupedComments,
 		User: user,
@@ -101,15 +93,18 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.New(r.PostForm)
 	form.MinLength("content", 200)
-	form.Required("category")
-	form.Required("title")
+	form.Required("category", "title")
 
 	if !form.Valid() {
 		utils.Render(w, blogs.CreateBlogForm(categories, form))
 		return
 	}
 
-	categoryID, _ := strconv.Atoi(form.Values.Get("category"))
+	categoryID, err := strconv.Atoi(form.Values.Get("category"))
+	if err != nil {
+		utils.ClientError(w, "invalid category ID", http.StatusBadRequest)
+		return
+	}
 
 	blog := types.Blog{
 		Title: form.Values.Get("title"),
@@ -132,9 +127,13 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
-	blogID, value, err := parseLikeRequest(r)
+	blogID, value, err := parseCreateBlogLikeRequest(r)
 	if err != nil {
 		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
+		return
+	}
+
+	if !validateCreateBlogLikeRequest(r) {
 		return
 	}
 
@@ -155,6 +154,7 @@ func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
 		utils.ServerError(w, err)
 		return
 	}
+	
 	blogLikes, err := h.blogStore.GetBlogLikes(user.ID, blogID)
 	if err != nil {
 		utils.ServerError(w, err)
@@ -165,9 +165,13 @@ func (h *blogHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
-	blogID, value, err := parseLikeRequest(r)
+	blogID, value, err := parseCreateBlogLikeRequest(r)
 	if err != nil {
-		utils.ServerError(w, err)
+		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
+		return
+	}
+
+	if !validateCreateBlogLikeRequest(r) {
 		return
 	}
 
@@ -182,6 +186,7 @@ func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
 		utils.ServerError(w, err)
 		return
 	}
+
 	blogLikes, err := h.blogStore.GetBlogLikes(user.ID, blogID)
 	if err != nil {
 		utils.ServerError(w, err)
@@ -191,16 +196,29 @@ func (h *blogHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
 	utils.Render(w, components.Reactions(blogLikes, "blog", blogID))
 }
 
-func parseLikeRequest(r *http.Request) (int, int, error) {
+func parseCreateBlogLikeRequest(r *http.Request) (int, int, error) {
 	if err := r.ParseForm(); err != nil {
 		return 0, 0, err
 	}
 
-	str := chi.URLParam(r, "blogID")
-	blogID, _ := strconv.Atoi(str)
+	blogID, err := strconv.Atoi(chi.URLParam(r, "blogID"))
+	if err != nil {
+		return 0, 0, err
+	}
 
-	valueStr := r.PostForm.Get("value")
-	value, _ := strconv.Atoi(valueStr)
+	value, err := strconv.Atoi(r.PostForm.Get("value"))
+	if err != nil {
+		return 0, 0, err
+	}
 
 	return blogID, value, nil
+}
+
+func validateCreateBlogLikeRequest(r *http.Request) bool {
+	form := forms.New(r.PostForm)
+	form.Required("value")
+	form.MinValue("value", -1)
+	form.MaxValue("value", 1)
+
+	return form.Valid()
 }

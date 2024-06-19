@@ -23,7 +23,7 @@ templ RegisterForm(form *forms.Form) {
      <form class="grid" hx-post="/user/register" hx-swap="outerHTML">
         @components.Input(components.InputProps{
             Typ: "text",
-            Placeholder: "John",
+            Placeholder: "Username...",
             Label: "Username",
             Name: "username",
             Error: form.Errors.Get("username"),
@@ -31,7 +31,7 @@ templ RegisterForm(form *forms.Form) {
         })
         @components.Input(components.InputProps{
             Typ: "text",
-            Placeholder: "john@email.com",
+            Placeholder: "Email...",
             Label: "Email",
             Name: "email",
             Error: form.Errors.Get("email"),
@@ -39,7 +39,7 @@ templ RegisterForm(form *forms.Form) {
         })
         @components.Input(components.InputProps{
             Typ: "password",
-            Placeholder: "Secret password",
+            Placeholder: "Password...",
             Label: "Password",
             Name: "password",
             Error: form.Errors.Get("password"),
@@ -47,7 +47,7 @@ templ RegisterForm(form *forms.Form) {
         })
         @components.Input(components.InputProps{
             Typ: "password",
-            Placeholder: "Repeat secret password",
+            Placeholder: "Repeat password...",
             Label: "Repeat password",
             Name: "password_repeat",
             Error: form.Errors.Get("password_repeat"),

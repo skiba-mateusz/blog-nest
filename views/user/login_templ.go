@@ -42,7 +42,7 @@ func LoginForm(form *forms.Form) templ.Component {
 			Typ:         "text",
 			Name:        "email",
 			Label:       "Email",
-			Placeholder: "john@example.com",
+			Placeholder: "Email...",
 			Value:       form.Values.Get("email"),
 			Error:       form.Errors.Get("email"),
 		}).Render(ctx, templ_7745c5c3_Buffer)
@@ -50,10 +50,10 @@ func LoginForm(form *forms.Form) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
-			Typ:         "text",
+			Typ:         "password",
 			Name:        "password",
 			Label:       "Password",
-			Placeholder: "Your secret password",
+			Placeholder: "Password...",
 			Value:       form.Values.Get("password"),
 			Error:       form.Errors.Get("password"),
 		}).Render(ctx, templ_7745c5c3_Buffer)

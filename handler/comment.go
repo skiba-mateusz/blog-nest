@@ -22,7 +22,7 @@ func NewCommentHandler(commentStore types.CommentStore) *commentHandler {
 }
 
 func (h commentHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request) {
-	commentID, value, err := parseCommentLikeRequest(r)
+	commentID, value, err := parseCreateCommentLikeRequest(r)
 	if err != nil {
 		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
 		return
@@ -30,7 +30,7 @@ func (h commentHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request)
 
 	user, ok := auth.GetUserFromContext(r.Context())
 	if !ok {
-		likes, err := h.commentStore.GetCommentLikes(commentID, 0)
+		likes, err := h.commentStore.GetCommentLikes(commentID, user.ID)
 		if err != nil {
 			utils.ServerError(w, err)
 			return 
@@ -45,6 +45,7 @@ func (h commentHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request)
 		utils.ServerError(w, err)
 		return
 	}
+
 	likes, err := h.commentStore.GetCommentLikes(commentID, user.ID)
 	if err != nil {
 		utils.ServerError(w, err)
@@ -55,7 +56,7 @@ func (h commentHandler) HandleCreateLike(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *commentHandler) HandleUpdateLike(w http.ResponseWriter, r *http.Request) {
-	commentID, value, err := parseCommentLikeRequest(r)
+	commentID, value, err := parseCreateCommentLikeRequest(r)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
@@ -87,9 +88,6 @@ func (h commentHandler) HandleCreateComment(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	str := chi.URLParam(r, "blogID")
-	blogID, _ := strconv.Atoi(str)
-
 	user, ok := auth.GetUserFromContext(r.Context())
 	if !ok {
 		auth.PermissionDenied(w, r)
@@ -97,15 +95,15 @@ func (h commentHandler) HandleCreateComment(w http.ResponseWriter, r *http.Reque
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("parent_id")
-	form.Required("content")
+	form.Required("parent_id", "content")
 
 	if !form.Valid() {
 		return
 	}
-	
-	parentID, _ := strconv.Atoi(form.Values.Get("parent_id"))
 
+	blogID, _ := strconv.Atoi(chi.URLParam(r, "blogID"))
+	parentID, _ := strconv.Atoi(form.Values.Get("parent_id"))
+	
 	comment := types.Comment{
 		Content: form.Values.Get("content"),
 		ParentID: parentID,
@@ -123,6 +121,7 @@ func (h commentHandler) HandleCreateComment(w http.ResponseWriter, r *http.Reque
 		utils.ServerError(w, err)
 		return
 	}
+	
 	comment.ID = commentID
 
 	if parentID != 0 {
@@ -166,19 +165,20 @@ func groupComments(comments []types.Comment, parentID int) []types.Comment {
 	return getReplies(comments, parentID)
 }
 
-func parseCommentLikeRequest(r *http.Request) (int, int, error) {
+func parseCreateCommentLikeRequest(r *http.Request) (int, int, error) {
 	if err := r.ParseForm(); err != nil {
 		return 0, 0, err
 	}
 
-	str := chi.URLParam(r, "commentID")
-	commentID, err := strconv.Atoi(str)
+	commentID, err := strconv.Atoi(chi.URLParam(r, "commentID"))
 	if err != nil {
 		return 0, 0, err
 	}
 
-	valueStr := r.PostForm.Get("value")
-	value, _ := strconv.Atoi(valueStr)
+	value, err := strconv.Atoi(r.PostForm.Get("value"))
+	if err != nil {
+		return 0, 0, err
+	}
 
 	return commentID, value, nil
 }

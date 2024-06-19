@@ -23,7 +23,7 @@ type Blog struct {
 	Content		string
 	Category	Category
 	User		User
-	Likes		*Likes
+	Likes		Likes
 	CreatedAt	time.Time
 }
 
@@ -53,7 +53,7 @@ type UserStore interface {
 type BlogStore interface {
 	GetCategories() ([]Category, error)
 	GetBlogs() ([]Blog, error)
-	GetBlogByID(blogID int) (*Blog, error)
+	GetBlogByID(blogID, userID int) (*Blog, error)
 	CreateBlog(blog Blog) (int, error)
 	CreateLike(userID, blogID, value int) (error)
 	UpdateLike(userID, blogID, value int) (error)

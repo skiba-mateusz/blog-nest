@@ -37,20 +37,21 @@ func main() {
 	router.Use(auth.WithJWT(userStore))
 
 	router.Get("/", homeHandler.HandleIndex)
-	router.Get("/blog/create", blogHandler.HandleCreateShow)
-	router.Get("/blog/{blogID}", blogHandler.HandleBlogShow)
+
 	router.Get("/user/register", userHandler.HandleRegisterShow)
 	router.Get("/user/login", userHandler.HandleLoginShow)
 	router.Get("/user/logout", userHandler.HandleLogout)
-
 	router.Post("/user/register", userHandler.HandleRegisterUser)
 	router.Post("/user/login", userHandler.HandleLoginUser)
+
+	router.Get("/blog/create", blogHandler.HandleCreateShow)
+	router.Get("/blog/{blogID}", blogHandler.HandleBlogShow)
 	router.Post("/blog/create", blogHandler.HandleCreateBlog)
 	router.Post("/blog/{blogID}/like", blogHandler.HandleCreateLike)
-	router.Post("/comment/{commentID}/like", commentHandler.HandleCreateLike)
 	router.Post("/blog/{blogID}/comment", commentHandler.HandleCreateComment)
-
 	router.Put("/blog/{blogID}/like", blogHandler.HandleUpdateLike)
+
+	router.Post("/comment/{commentID}/like", commentHandler.HandleCreateLike)
 	router.Put("/comment/{commentID}/like", commentHandler.HandleUpdateLike)
 
 	fs := http.FileServer(http.Dir("./static"))

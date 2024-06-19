@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/mail"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -32,6 +33,27 @@ func (f *Form) MinLength(field string, length int) {
 	value := f.Values.Get(field)
 	if len(value) < length {
 		f.Errors.Add(field, fmt.Sprintf("This field needs to be at least %d characters long", length))
+	}
+}
+
+func (f *Form) MaxLength(field string, length int) {
+	value := f.Values.Get(field)
+	if len(value) > length {
+		f.Errors.Add(field, fmt.Sprintf("This field cannot be longer than %d characters", length))
+	}
+}
+
+func (f *Form) MinValue(field string, minValue int) {
+	value, _ := strconv.Atoi(f.Values.Get(field))
+	if value < minValue {
+		f.Errors.Add(field, fmt.Sprintf("This field must be at least %d", minValue))
+	}
+}
+
+func (f *Form) MaxValue(field string, maxValue int) {
+	value, _ := strconv.Atoi(f.Values.Get(field))
+	if value > maxValue {
+		f.Errors.Add(field, fmt.Sprintf("This field can't be more than %d", maxValue))
 	}
 }
 

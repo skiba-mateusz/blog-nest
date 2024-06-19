@@ -60,13 +60,11 @@ func (s *userStore) CreateUser(user types.User) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
 
-	var id int
+	stmt := `INSERT INTO users (username, email, password) VALUES($1, $2, $3) RETURNING id`
 
-	row := s.db.QueryRowContext(ctx, `INSERT INTO users (username, email, password) VALUES($1, $2, $3) RETURNING id`,
-		user.Username,
-	  	user.Email,
-	  	user.Password,
-	)
+	row := s.db.QueryRowContext(ctx, stmt, user.Username, user.Email, user.Password)
+
+	var id int
 	err := row.Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create user: %v", err)

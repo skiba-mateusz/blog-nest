@@ -109,6 +109,11 @@ func WithJWT(userStore types.UserStore) func(http.Handler) http.Handler {
 
 func GetUserFromContext(ctx context.Context) (*types.User, bool) {
 	user, ok := ctx.Value(UserKey).(*types.User)
+	if !ok {
+		return &types.User{
+			ID: 0,
+		}, ok
+	}
 	return user, ok
 }
 
