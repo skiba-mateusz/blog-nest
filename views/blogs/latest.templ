@@ -1,0 +1,16 @@
+package blogs 
+
+import "github.com/skiba-mateusz/blog-nest/types"
+
+templ Latest(blogs []types.Blog) {
+    <section class="py-32">
+        <div class="container container--large flow">
+            <h2 class="heading">Latest Blogs</h2>
+            <div class="latest-blogs">
+                for _, blog := range blogs {
+                    @Preview(blog, "")
+                }
+            </div>
+        </div>
+    </section>
+}

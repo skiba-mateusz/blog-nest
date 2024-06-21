@@ -39,20 +39,7 @@ func Create(form *forms.Form, blogID int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"next\" hx-swap=\"afterbegin\"><input type=\"hidden\" name=\"parent_id\" value=\"0\"> <textarea class=\"create-comment__content\" name=\"content\" placeholder=\"Add coment\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(form.Values.Get("content"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/comments/create.templ`, Line: 9, Col: 118}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</textarea> <button class=\"create-comment__btn btn btn--rounded\"><box-icon type=\"solid\" name=\"send\"></box-icon></button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"next\" hx-swap=\"afterbegin\"><input type=\"hidden\" name=\"parent_id\" value=\"0\"> <textarea class=\"create-comment__content\" name=\"content\" placeholder=\"Add coment\" required></textarea> <button class=\"create-comment__btn btn btn--rounded\"><box-icon type=\"solid\" name=\"send\"></box-icon></button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

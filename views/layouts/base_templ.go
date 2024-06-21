@@ -131,7 +131,7 @@ func header(user *types.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">BlogNest</a><form class=\"search-box\" role=\"search\"><label for=\"search-box-input\" class=\"sr-only\">Search for blogs</label> <box-icon class=\"search-box__icon\" name=\"search\"></box-icon> <input class=\"search-box__input\" id=\"search-box-input\" type=\"search\" placeholder=\"Search blogs\"></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">BlogNest</a><form method=\"GET\" action=\"/blog/search\" class=\"search-box\" role=\"search\"><label for=\"search-box-input\" class=\"sr-only\">Search for blogs</label> <box-icon class=\"search-box__icon\" name=\"search\"></box-icon> <input class=\"search-box__input\" id=\"search-box-input\" name=\"search_query\" type=\"search\" placeholder=\"Search blogs\" required></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

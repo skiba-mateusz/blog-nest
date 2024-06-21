@@ -6,26 +6,36 @@ import "github.com/skiba-mateusz/blog-nest/views/blogs"
 
 
 type IndexData struct {
-    Title   string
-    Blogs   []types.Blog
-	User 	*types.User
+    Title       string
+    Blogs       []types.Blog
+    LatestBlogs []types.Blog
+    TotalBlogs  int
+    Page        int
+    TotalPages  int
+	User 	    *types.User
 }
 
 templ Index(data IndexData) {
     @layouts.Base(data.Title, data.User) {
-        <section class="my-24">
-            <div class="container container--small flow">
-                <h1 class="heading">Index Page</h1>
-                <ul class="grid">
-                    if len(data.Blogs) > 0 {
-                        for _, blog := range data.Blogs {
-                            <li>
-                                @blogs.Preview(blog)
-                            </li>
-                        }
-                    }
-                </ul>
+        @blogs.Latest(data.LatestBlogs)
+        <div class="container container--large grid grid-2-1" >
+            <section class="py-32 flow">
+                <h2 class="heading">More Blogs</h2>
+                @blogs.List(blogs.ListData{
+                    Blogs: data.Blogs,
+                    TotalBlogs: data.TotalBlogs,
+                    Page: data.Page,
+                    TotalPages: data.TotalPages,
+                })
+            </section>
+            <div class="flow py-32">
+                <h2 class="heading">Categories</h2>
+                <section class="panel">
+                    <p>Category 1</p>
+                    <p>Category 2</p>
+                    <p>Category 3</p>
+                </section>
             </div>
-        </section>
+        </div>
     }
 }

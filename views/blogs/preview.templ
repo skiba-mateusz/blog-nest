@@ -3,15 +3,15 @@ package blogs
 import "fmt"
 import "github.com/skiba-mateusz/blog-nest/types"
 
-templ Preview(blog types.Blog) {
-    <a class="blog-preview" href={ templ.URL(fmt.Sprintf("/blog/%d", blog.ID)) }>
+templ Preview(blog types.Blog, variant string) {
+    <a class={"blog-preview", templ.KV(fmt.Sprintf("blog-preview--%s", variant), variant != "")} href={ templ.URL(fmt.Sprintf("/blog/%d", blog.ID)) }>
         <article class="blog-preview__inner">
-            <div class="blog-preview__content">
-                <h2 class="blog-preview__title">{ blog.Title }</h2>
-            </div>
             <figure class="blog-preview__img-wrapper backdrop">
                 <img class="blog-preview__img" src="/static/images/blog.jpg" alt={ blog.Title }/>
             </figure>
+            <div class="blog-preview__content">
+                <h2 class="blog-preview__title">{ blog.Title }</h2>
+            </div>
         </article>
     </a>
 }

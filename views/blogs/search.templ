@@ -1,0 +1,30 @@
+package blogs
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/types"
+
+type SearchData struct {
+    Title       string
+    User        *types.User
+    SearchQuery string
+    Blogs       []types.Blog
+    TotalBlogs  int
+    Page        int
+    TotalPages  int
+}
+
+templ Search(data SearchData) {
+    @layouts.Base(data.Title, data.User) {
+        <section class="py-48">
+            <div class="container container--large flow">
+                <h2>Results for "{data.SearchQuery}"</h2>
+                @List(ListData{
+                    Blogs: data.Blogs,
+                    TotalBlogs: data.TotalBlogs,
+                    Page: data.Page,
+                    TotalPages: data.TotalPages,
+                })
+            </div>
+        </section>
+    }
+}

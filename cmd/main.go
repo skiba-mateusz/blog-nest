@@ -46,6 +46,8 @@ func main() {
 
 	router.Get("/blog/create", blogHandler.HandleCreateShow)
 	router.Get("/blog/{blogID}", blogHandler.HandleBlogShow)
+	router.Get("/blog/page/{page}", blogHandler.HandleGetBlogs)
+	router.Get("/blog/search", blogHandler.HandleSearchShow)
 	router.Post("/blog/create", blogHandler.HandleCreateBlog)
 	router.Post("/blog/{blogID}/like", blogHandler.HandleCreateLike)
 	router.Post("/blog/{blogID}/comment", commentHandler.HandleCreateComment)

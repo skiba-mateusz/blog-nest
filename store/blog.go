@@ -40,9 +40,30 @@ func (s *blogStore) GetCategories() ([]types.Category, error) {
 	return categories, nil
 }
 
-func (s *blogStore) GetBlogs() ([]types.Blog, error) {
+func (s *blogStore) GetBlogs(offset int, searchQuery string) ([]types.Blog, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
+
+	var totalBlogs int	
+	blogs := []types.Blog{}
+
+	row := s.db.QueryRowContext(ctx, `
+		SELECT 
+			count(*) 
+		FROM 
+			blogs b 
+		WHERE 
+			($1 = '' OR b.title ILIKE '%' || $1 || '%')
+			AND ($1 != '' OR b.id NOT IN (
+				SELECT id
+				FROM blogs 
+				ORDER BY created_at DESC 
+				LIMIT 4
+			))
+		`,	 searchQuery)
+	if err := row.Scan(&totalBlogs); err != nil {
+		return blogs, 0, err
+	}
 
 	query := `
 		SELECT 
@@ -50,20 +71,68 @@ func (s *blogStore) GetBlogs() ([]types.Blog, error) {
 		FROM 
 			blogs b
 		INNER JOIN
-			categories c on b.category_id = c.id	
+			categories c on b.category_id = c.id
+		WHERE
+			($2 = '' OR b.title ILIKE '%' || $2 || '%') 
+			AND ($2 != '' OR b.id NOT IN (
+				SELECT id
+				FROM blogs 
+				ORDER BY created_at DESC 
+				LIMIT 4
+			))
+		ORDER BY 
+			b.created_at DESC
+		LIMIT 
+			4
+		OFFSET
+			$1
 	`
 
-	rows, err := s.db.QueryContext(ctx, query)
+	rows, err := s.db.QueryContext(ctx, query, offset, searchQuery)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	blogs := []types.Blog{}
 	for rows.Next() {
 		blog := types.Blog{}
 		err := rows.Scan(&blog.ID, &blog.Title, &blog.Category.Name)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
+		}
+		blogs = append(blogs, blog)
+	}
+
+	return blogs, totalBlogs, nil
+}
+
+func (s *blogStore) GetLatestBlogs() ([]types.Blog, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	defer cancel()
+
+	query := `
+		SELECT 
+			b.id, b.title,
+			c.name 
+		FROM 
+			blogs b
+		INNER JOIN
+			categories c ON c.id = b.category_id
+		ORDER BY 
+			b.created_at DESC 
+		LIMIT 4
+	`
+	blogs := []types.Blog{}
+
+	rows, err := s.db.QueryContext(ctx, query)
+	if err != nil {
+		return blogs, err
+	}
+
+	for rows.Next() {
+		blog := types.Blog{}
+		err := rows.Scan(&blog.ID, &blog.Title, &blog.Category.Name)
+		if err != nil {
+			return blogs, err
 		}
 		blogs = append(blogs, blog)
 	}

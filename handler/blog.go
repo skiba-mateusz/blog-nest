@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -45,6 +46,38 @@ func (h *blogHandler) HandleCreateShow(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *blogHandler) HandleSearchShow(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
+		return
+	}
+
+	user, _ := auth.GetUserFromContext(r.Context())
+
+	searchQuery := r.URL.Query().Get("search_query")
+	if searchQuery == "" {
+		return
+	}
+
+	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(0, searchQuery)
+	if err != nil {
+		utils.ServerError(w, err)
+		return 
+	}
+
+	totalPages := (totalBlogs + 3) / 4
+
+	utils.Render(w, blogs.Search(blogs.SearchData{
+		Title: fmt.Sprintf("'%s' Results | BlogNest", searchQuery),
+		User: user,
+		SearchQuery: searchQuery,
+		Blogs: blogsSlice,
+		TotalBlogs: totalBlogs,
+		Page: 1,
+		TotalPages: totalPages,
+	}))
+}
+
 func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
 	blogID, err := strconv.Atoi(chi.URLParam(r, "blogID"))
 	if err != nil {
@@ -77,7 +110,39 @@ func (h *blogHandler) HandleBlogShow(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *blogHandler) HandleGetBlogs(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(chi.URLParam(r, "page"))
+	if page < 1 {
+		page = 1
+	}
+
+	offset := (page - 1) * 4
+	searchQuery := r.URL.Query().Get("search_query")
+
+	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(offset, searchQuery)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	totalPages := (totalBlogs + 3) / 4
+	log.Println(totalPages)
+
+	utils.Render(w, blogs.List(blogs.ListData{
+		Blogs: blogsSlice,
+		TotalBlogs: totalBlogs,
+		Page: page,
+		TotalPages: totalPages,
+	}))
+}
+
 func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		utils.ClientError(w, "invalid requesta data", http.StatusBadRequest)
+		return
+	}
+
 	categories, err := h.blogStore.GetCategories()
 	if err != nil {
 		utils.ServerError(w, err)
@@ -94,6 +159,8 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 	form.MinLength("content", 200)
 	form.Required("category", "title")
+
+	log.Println(form)
 
 	if !form.Valid() {
 		utils.Render(w, blogs.CreateBlogForm(categories, form))
