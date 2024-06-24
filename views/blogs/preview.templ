@@ -10,6 +10,7 @@ templ Preview(blog types.Blog, variant string) {
                 <img class="blog-preview__img" src="/static/images/blog.jpg" alt={ blog.Title }/>
             </figure>
             <div class="blog-preview__content">
+                <span class="category">{ blog.Category.Name }</span>
                 <h2 class="blog-preview__title">{ blog.Title }</h2>
             </div>
         </article>

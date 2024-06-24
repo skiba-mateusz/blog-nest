@@ -15,10 +15,11 @@ import "strconv"
 import "fmt"
 
 type ListData struct {
-	Blogs      []types.Blog
-	TotalPages int
-	TotalBlogs int
-	Page       int
+	Blogs       []types.Blog
+	TotalPages  int
+	TotalBlogs  int
+	Page        int
+	SearchQuery string
 }
 
 func GenerateRange(start, end int) []int {
@@ -32,7 +33,17 @@ func GenerateRange(start, end int) []int {
 	return rangeSlice
 }
 
-func paginationBtn(currentPage, page int) templ.Component {
+func displayResultsRange(totalBlogs, page int) string {
+	start := (page-1)*types.DefaultPageSize + 1
+	end := start + types.DefaultPageSize - 1
+	if totalBlogs < end {
+		end = totalBlogs
+	}
+
+	return fmt.Sprintf("Showing %d - %d from %d results", start, end, totalBlogs)
+}
+
+func paginationBtn(currentPage, page int, searchQuery string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -68,9 +79,9 @@ func paginationBtn(currentPage, page int) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/blog/page/%d", page))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/blog/page/%d?search_query=%s", page, searchQuery))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/list.templ`, Line: 28, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/list.templ`, Line: 39, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -83,7 +94,7 @@ func paginationBtn(currentPage, page int) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(page))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/list.templ`, Line: 29, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/list.templ`, Line: 40, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -113,8 +124,17 @@ func List(data ListData) templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		if len(data.Blogs) > 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"blogs\" class=\"flow\"><ul class=\"grid\" style=\"--grid-spacer: var(--size-16)\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"blogs\" class=\"flow py-24\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(data.Blogs) <= 0 {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-medium text-20\">No results, try something else</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul class=\"grid\" style=\"--grid-spacer: var(--size-16)\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -132,20 +152,43 @@ func List(data ListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul><hr><div class=\"flex-group\" style=\"--flex-spacer: var(--size-8)\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, i := range GenerateRange(1, data.TotalPages) {
-				templ_7745c5c3_Err = paginationBtn(data.Page, i).Render(ctx, templ_7745c5c3_Buffer)
+			if data.TotalBlogs > types.DefaultPageSize {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<hr><div class=\"flex-group\" style=\"--flex-spacer: var(--size-8)\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, i := range GenerateRange(1, data.TotalPages) {
+					templ_7745c5c3_Err = paginationBtn(data.Page, i, data.SearchQuery).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"ml-auto\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(displayResultsRange(data.TotalBlogs, data.Page))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/list.templ`, Line: 62, Col: 90}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if !templ_7745c5c3_IsBuffer {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)

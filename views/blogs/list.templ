@@ -4,11 +4,13 @@ import "github.com/skiba-mateusz/blog-nest/types"
 import "strconv"
 import "fmt"
 
+
 type ListData struct {
     Blogs       []types.Blog
     TotalPages  int
     TotalBlogs  int
     Page        int
+    SearchQuery string
 }
 
 func GenerateRange(start, end int) []int {
@@ -22,17 +24,28 @@ func GenerateRange(start, end int) []int {
     return rangeSlice
 }
 
+func displayResultsRange(totalBlogs, page int) string {
+    start := (page - 1) * types.DefaultPageSize + 1
+    end := start + types.DefaultPageSize - 1
+    if totalBlogs < end {
+        end = totalBlogs
+    }
 
-templ paginationBtn(currentPage, page int) {
+    return fmt.Sprintf("Showing %d - %d from %d results", start, end, totalBlogs)
+}
+
+templ paginationBtn(currentPage, page int, searchQuery string) {
     <button onClick="document.getElementById('blogs').scrollIntoView()" class={"btn btn--primary", templ.KV("btn--secondary", page == currentPage)} 
-            hx-get={ fmt.Sprintf("/blog/page/%d", page) } hx-target="#blogs" hx-swap="outerHTML">
+            hx-get={ fmt.Sprintf("/blog/page/%d?search_query=%s", page, searchQuery) } hx-target="#blogs" hx-swap="outerHTML">
         { strconv.Itoa(page) }
     </button>
 }
 
 templ List(data ListData) {
-    if len(data.Blogs) > 0 {
-        <div id="blogs" class="flow">
+    <div id="blogs" class="flow py-24">
+        if len(data.Blogs) <= 0 {
+            <p class="text-medium text-20">No results, try something else</p>
+        } else {
             <ul class="grid" style="--grid-spacer: var(--size-16)">
                 for _, blog := range data.Blogs {
                     <li>
@@ -40,12 +53,16 @@ templ List(data ListData) {
                     </li>
                 }
             </ul>
-            <hr/>
-            <div class="flex-group" style="--flex-spacer: var(--size-8)">
-                for _, i := range GenerateRange(1, data.TotalPages) {
-                    @paginationBtn(data.Page, i)
-                }
-            </div>
-        </div>
-    }
+            if data.TotalBlogs > types.DefaultPageSize {
+                <hr/>
+                <div class="flex-group" style="--flex-spacer: var(--size-8)">
+                    for _, i := range GenerateRange(1, data.TotalPages) {
+                        @paginationBtn(data.Page, i, data.SearchQuery)
+                    }
+                    <div class="ml-auto">{ displayResultsRange(data.TotalBlogs, data.Page) }</div>
+                </div>
+            }
+        }
+    </div>
+
 }

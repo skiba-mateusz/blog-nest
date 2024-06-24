@@ -12,11 +12,14 @@ import "bytes"
 
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
 import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "fmt"
 
 type SearchData struct {
 	Title       string
 	User        *types.User
 	SearchQuery string
+	Category    string
 	Blogs       []types.Blog
 	TotalBlogs  int
 	Page        int
@@ -42,33 +45,70 @@ func Search(data SearchData) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"py-48\"><div class=\"container container--large flow\"><h2>Results for \"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"py-48\"><div class=\"container container--large flow\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.SearchQuery)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/search.templ`, Line: 20, Col: 50}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			templ_7745c5c3_Err = components.GoBack().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"</h2>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h2 class=\"\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(data.SearchQuery) > 0 {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p>Results for <span class=\"text-medium\">\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.SearchQuery)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/search.templ`, Line: 26, Col: 84}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"</span></p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Results")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><form hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/blog/page/%d?search_query=%s", data.Page, data.SearchQuery))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/blogs/search.templ`, Line: 31, Col: 104}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#blogs\" hx-swap=\"outerHTML\" hx-trigger=\"change\"><fieldset class=\"radio-group\"><legend class=\"text-semi-bold\">Category</legend> <input id=\"Movies\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Movies\"> <label for=\"Movies\" class=\"radio-group__btn\">Movies</label> <input id=\"Travelling\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Travelling\"> <label for=\"Travelling\" class=\"radio-group__btn\">Travelling</label> <input id=\"Studying\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Studying\"> <label for=\"Studying\" class=\"radio-group__btn\">Studying</label> <input id=\"Books\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Books\"> <label for=\"Books\" class=\"radio-group__btn\">Books</label> <input id=\"All\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"\" checked> <label for=\"All\" class=\"radio-group__btn\">All</label></fieldset></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = List(ListData{
-				Blogs:      data.Blogs,
-				TotalBlogs: data.TotalBlogs,
-				Page:       data.Page,
-				TotalPages: data.TotalPages,
+				Blogs:       data.Blogs,
+				TotalBlogs:  data.TotalBlogs,
+				Page:        data.Page,
+				TotalPages:  data.TotalPages,
+				SearchQuery: data.SearchQuery,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></section>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></section><script>\n\n        </script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

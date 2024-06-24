@@ -52,7 +52,7 @@ type UserStore interface {
 
 type BlogStore interface {
 	GetCategories() ([]Category, error)
-	GetBlogs(offset int, searchQuery string) ([]Blog, int, error)
+	GetBlogs(offset, limit int, searchQuery, category string) ([]Blog, int, error)
 	GetLatestBlogs() ([]Blog, error)
 	GetBlogByID(blogID, userID int) (*Blog, error)
 	CreateBlog(blog Blog) (int, error)

@@ -40,7 +40,7 @@ func (s *blogStore) GetCategories() ([]types.Category, error) {
 	return categories, nil
 }
 
-func (s *blogStore) GetBlogs(offset int, searchQuery string) ([]types.Blog, int, error) {
+func (s *blogStore) GetBlogs(offset, limit int, searchQuery, category string) ([]types.Blog, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
 
@@ -52,15 +52,18 @@ func (s *blogStore) GetBlogs(offset int, searchQuery string) ([]types.Blog, int,
 			count(*) 
 		FROM 
 			blogs b 
+		INNER JOIN
+			categories c ON b.category_id = c.id
 		WHERE 
 			($1 = '' OR b.title ILIKE '%' || $1 || '%')
+			AND ($2 = '' OR c.name = $2)
 			AND ($1 != '' OR b.id NOT IN (
 				SELECT id
 				FROM blogs 
 				ORDER BY created_at DESC 
 				LIMIT 4
 			))
-		`,	 searchQuery)
+		`,	 searchQuery, category)
 	if err := row.Scan(&totalBlogs); err != nil {
 		return blogs, 0, err
 	}
@@ -74,6 +77,7 @@ func (s *blogStore) GetBlogs(offset int, searchQuery string) ([]types.Blog, int,
 			categories c on b.category_id = c.id
 		WHERE
 			($2 = '' OR b.title ILIKE '%' || $2 || '%') 
+			AND ($3 = '' OR c.name = $3)
 			AND ($2 != '' OR b.id NOT IN (
 				SELECT id
 				FROM blogs 
@@ -83,12 +87,12 @@ func (s *blogStore) GetBlogs(offset int, searchQuery string) ([]types.Blog, int,
 		ORDER BY 
 			b.created_at DESC
 		LIMIT 
-			4
+			$4
 		OFFSET
 			$1
 	`
 
-	rows, err := s.db.QueryContext(ctx, query, offset, searchQuery)
+	rows, err := s.db.QueryContext(ctx, query, offset, searchQuery, category, limit)
 	if err != nil {
 		return nil, 0, err
 	}

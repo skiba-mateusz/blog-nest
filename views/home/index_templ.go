@@ -13,9 +13,11 @@ import "bytes"
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
 import "github.com/skiba-mateusz/blog-nest/types"
 import "github.com/skiba-mateusz/blog-nest/views/blogs"
+import "fmt"
 
 type IndexData struct {
 	Title       string
+	Categories  []types.Category
 	Blogs       []types.Blog
 	LatestBlogs []types.Blog
 	TotalBlogs  int
@@ -47,7 +49,7 @@ func Index(data IndexData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <div class=\"container container--large grid grid-2-1\"><section class=\"py-32 flow\"><h2 class=\"heading\">More Blogs</h2>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <div class=\"container container--large grid grid-2-1\"><section class=\"py-32\"><h2 class=\"heading\">More Blogs</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -60,7 +62,20 @@ func Index(data IndexData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><div class=\"flow py-32\"><h2 class=\"heading\">Categories</h2><section class=\"panel\"><p>Category 1</p><p>Category 2</p><p>Category 3</p></section></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><div class=\"flow py-32\"><form hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/blog/page/%d?search_query=%s", data.Page, ""))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/home/index.templ`, Line: 33, Col: 90}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#blogs\" hx-swap=\"outerHTML\" hx-trigger=\"change\"><fieldset class=\"radio-group\"><legend class=\"text-semi-bold\">Category</legend> <input id=\"Movies\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Movies\"> <label for=\"Movies\" class=\"radio-group__btn\">Movies</label> <input id=\"Travelling\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Travelling\"> <label for=\"Travelling\" class=\"radio-group__btn\">Travelling</label> <input id=\"Studying\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Studying\"> <label for=\"Studying\" class=\"radio-group__btn\">Studying</label> <input id=\"Books\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"Books\"> <label for=\"Books\" class=\"radio-group__btn\">Books</label> <input id=\"All\" class=\"sr-only\" type=\"radio\" name=\"category\" value=\"\" checked> <label for=\"All\" class=\"radio-group__btn\">All</label></fieldset></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

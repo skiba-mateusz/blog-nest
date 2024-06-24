@@ -218,6 +218,14 @@ hr {
   border: 1px solid var(--clr-blue-500);
 }
 
+.category {
+  padding: var(--size-4);
+  width: min-content;
+  background-color: var(--clr-blue-500);
+  color: var(--clr-gray-50);
+  border-radius: var(--rounded-sm);
+}
+
 /* Blocks */
 
 .header {
@@ -291,12 +299,14 @@ hr {
   inset: 0;
   padding: var(--size-16);
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--size-8);
   color: var(--clr-gray-50);
   z-index: 2;
 }
 
 .blog-preview__title {
-  align-self: flex-end;
   font-size: var(--title-size);
 }
 
@@ -465,6 +475,33 @@ hr {
 .comments-list ul:where(:not(:first-child)) {
   padding-left: clamp(0.4rem, 2.5vw, 2rem);
   border-left: 2px solid var(--clr-gray-300);
+}
+
+.radio-group {
+  margin-inline: auto;
+  padding: var(--size-16);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-8);
+  border-radius: var(--rounded-sm);
+  border: 1px solid var(--clr-gray-300);
+}
+
+.radio-group__btn {
+  position: relative;
+  width: fit-content;
+  padding: var(--size-8) var(--size-16);
+  flex: 1 0 30%;
+  background-color: var(--clr-gray-200);
+  border-radius: var(--rounded-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-group input:checked + .radio-group__btn {
+  background-color: var(--clr-blue-500);
+  color: var(--clr-gray-50);
 }
 
 .avatar {
@@ -673,6 +710,9 @@ hr {
   margin-block: var(--size-48);
 }
 
+.py-24 {
+  padding-block: var(--size-24);
+}
 .py-32 {
   padding-block: var(--size-32);
 }

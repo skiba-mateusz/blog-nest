@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -55,22 +54,21 @@ func (h *blogHandler) HandleSearchShow(w http.ResponseWriter, r *http.Request) {
 	user, _ := auth.GetUserFromContext(r.Context())
 
 	searchQuery := r.URL.Query().Get("search_query")
-	if searchQuery == "" {
-		return
-	}
+	category := r.URL.Query().Get("category_name")
 
-	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(0, searchQuery)
+	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(0, types.DefaultPageSize, searchQuery, category)
 	if err != nil {
 		utils.ServerError(w, err)
 		return 
 	}
 
-	totalPages := (totalBlogs + 3) / 4
+	totalPages := (totalBlogs + types.DefaultPageSize - 1) / types.DefaultPageSize
 
 	utils.Render(w, blogs.Search(blogs.SearchData{
 		Title: fmt.Sprintf("'%s' Results | BlogNest", searchQuery),
 		User: user,
 		SearchQuery: searchQuery,
+		Category: category,
 		Blogs: blogsSlice,
 		TotalBlogs: totalBlogs,
 		Page: 1,
@@ -118,21 +116,22 @@ func (h *blogHandler) HandleGetBlogs(w http.ResponseWriter, r *http.Request) {
 
 	offset := (page - 1) * 4
 	searchQuery := r.URL.Query().Get("search_query")
+	category := r.URL.Query().Get("category")
 
-	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(offset, searchQuery)
+	blogsSlice, totalBlogs, err := h.blogStore.GetBlogs(offset, types.DefaultPageSize, searchQuery, category)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
 	}
 
-	totalPages := (totalBlogs + 3) / 4
-	log.Println(totalPages)
+	totalPages := (totalBlogs + types.DefaultPageSize - 1) / types.DefaultPageSize
 
 	utils.Render(w, blogs.List(blogs.ListData{
 		Blogs: blogsSlice,
 		TotalBlogs: totalBlogs,
 		Page: page,
 		TotalPages: totalPages,
+		SearchQuery: searchQuery,
 	}))
 }
 
@@ -159,8 +158,6 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 	form.MinLength("content", 200)
 	form.Required("category", "title")
-
-	log.Println(form)
 
 	if !form.Valid() {
 		utils.Render(w, blogs.CreateBlogForm(categories, form))

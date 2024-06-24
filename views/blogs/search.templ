@@ -2,11 +2,14 @@ package blogs
 
 import "github.com/skiba-mateusz/blog-nest/views/layouts"
 import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "fmt"
 
 type SearchData struct {
     Title       string
     User        *types.User
     SearchQuery string
+    Category    string
     Blogs       []types.Blog
     TotalBlogs  int
     Page        int
@@ -17,14 +20,50 @@ templ Search(data SearchData) {
     @layouts.Base(data.Title, data.User) {
         <section class="py-48">
             <div class="container container--large flow">
-                <h2>Results for "{data.SearchQuery}"</h2>
+                @components.GoBack()
+                <h2 class="">
+                    if len(data.SearchQuery) > 0 {
+                        <p>Results for <span class="text-medium">"{ data.SearchQuery }"</span></p>
+                    } else {
+                        Results
+                    }    
+                </h2>
+                <form hx-get={ fmt.Sprintf("/blog/page/%d?search_query=%s", data.Page, data.SearchQuery) } hx-target="#blogs" hx-swap="outerHTML" hx-trigger="change">
+                    <fieldset class="radio-group">
+                        <legend class="text-semi-bold">Category</legend>
+                        <input id="Movies" class="sr-only" type="radio" name="category" value="Movies">
+                        <label for="Movies" class="radio-group__btn">
+                            Movies
+                        </label>
+                        <input id="Travelling" class="sr-only" type="radio" name="category" value="Travelling"/>
+                        <label for="Travelling" class="radio-group__btn">
+                            Travelling
+                        </label>
+                        <input id="Studying" class="sr-only" type="radio" name="category" value="Studying"/>
+                        <label for="Studying" class="radio-group__btn">
+                            Studying
+                        </label>
+                        <input id="Books" class="sr-only" type="radio" name="category" value="Books"/>
+                        <label for="Books" class="radio-group__btn">
+                            Books
+                        </label>
+                        <input id="All" class="sr-only" type="radio" name="category" value="" checked/>
+                        <label for="All" class="radio-group__btn">
+                            All
+                        </label>
+                    </fieldset>
+                </form>
                 @List(ListData{
                     Blogs: data.Blogs,
                     TotalBlogs: data.TotalBlogs,
                     Page: data.Page,
                     TotalPages: data.TotalPages,
+                    SearchQuery: data.SearchQuery,
                 })
             </div>
         </section>
+        <script>
+
+        </script>
     }
 }
