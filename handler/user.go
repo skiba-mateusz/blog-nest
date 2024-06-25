@@ -12,36 +12,49 @@ import (
 
 type userHandler struct {
 	userStore types.UserStore
+	s3Uploader types.S3Uploader
 }
 
-func NewUserHandler(userStore types.UserStore) *userHandler {
+func NewUserHandler(userStore types.UserStore, s3Uploader types.S3Uploader) *userHandler {
 	return &userHandler{
 		userStore: userStore,
+		s3Uploader: s3Uploader,
 	}
 }
 
 func (h *userHandler) HandleRegisterShow(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth.GetUserFromContext(r.Context())
+	if ok {
+		w.Header().Set("HX-Redirect", "/")
+	}
+
 	utils.Render(w, user.Register(user.RegisterData{
 		Title: "Register | BlogNest",
 		RegisterForm: &forms.Form{},
+		User: u,
 	}))
 } 
 
 func (h *userHandler) HandleLoginShow(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth.GetUserFromContext(r.Context())
+	if ok {
+		w.Header().Set("HX-Redirect", "/")
+	}
+
 	utils.Render(w, user.Login(user.LoginData{
 		Title: "Login | BlogNest",
 		LoginForm: &forms.Form{},
+		User: u,
 	}))
 }
 
-func (h *userHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
+func (h *userHandler) HandleRegisterUserStep1(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		utils.ClientError(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
 	form := forms.New(r.PostForm)
-
 	form.Required("username", "email", "password", "password_repeat")
 	form.MinLength("username", 4)
 	form.MinLength("password", 8)
@@ -49,7 +62,7 @@ func (h *userHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	form.PasswordsMatch("password", "password_repeat")
 
 	if !form.Valid() {
-		utils.Render(w, user.RegisterForm(form))
+		utils.Render(w, user.RegisterFormStep1(form))
 		return
 	}
 
@@ -67,7 +80,7 @@ func (h *userHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 
 	if existingUser != nil {
 		form.Errors.Add("email", "User with this email already exists")
-		utils.Render(w, user.RegisterForm(form))
+		utils.Render(w, user.RegisterFormStep1(form))
 		return
 	}
 
@@ -78,14 +91,65 @@ func (h *userHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	}
 	u.Password = hashedPassword
 
-	_, err = h.userStore.CreateUser(u)
+	id, err := h.userStore.CreateUser(u)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
 	}
 
-	w.Header().Set("HX-Redirect", "/user/login")
+	_, err = auth.GenerateToken(w, id)	
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	utils.Render(w, user.RegisterFormStep2(&forms.Form{}))
 } 
+
+func (h *userHandler) HandleRegisterUserStep2(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.ClientError(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("bio")
+	form.MaxLength("bio", 200)
+	
+	file, header, err := r.FormFile("avatar")
+	if err != nil {
+		form.Errors.Add("avatar", "Avatar is required")
+	} else {
+		defer file.Close()
+	}
+	
+	if !form.Valid() {
+		utils.Render(w, user.RegisterFormStep2(form))
+		return
+	}
+
+	s3Key, err := h.s3Uploader.PutObject(file, header.Filename, "avatars")
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	u, _ := auth.GetUserFromContext(r.Context())
+
+	user := types.User{
+		ID: u.ID,
+		AvatarPath: s3Key,
+		Bio: form.Values.Get("bio"),
+	}
+
+	err = h.userStore.UpdateUser(user)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/")
+}
 
 func (h *userHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {

@@ -1,0 +1,19 @@
+package components
+
+type TextareaProps struct {
+    Label       string
+    Placeholder string
+    Value       string
+    Name        string
+    Error       string
+}
+
+templ Textarea(props TextareaProps) {
+    <div class="grid" style="--grid-spacer: var(--size-8)">
+        <label for={ props.Name }>{ props.Label }</label>
+        <textarea id={ props.Name } class="textarea" cols="3" rows="3" placeholder={ props.Placeholder } name={ props.Name }>{ props.Value }</textarea>
+        if len(props.Error) > 0 {
+            <p role="alert">{ props.Error }</p>
+        }
+    </div>
+}

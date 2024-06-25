@@ -1,0 +1,3 @@
+ALTER TABLE users
+ADD COLUMN bio TEXT DEFAULT '',
+ADD COLUMN avatar_path TEXT DEFAULT '';

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"io"
 	"time"
 )
 
@@ -9,6 +10,8 @@ type User struct {
 	Username	string
 	Email		string
 	Password	string
+	Bio			string
+	AvatarPath	string
 	CreatedAt	time.Time
 }
 
@@ -18,13 +21,14 @@ type Category struct {
 }
 
 type Blog struct {
-	ID			int
-	Title		string
-	Content		string
-	Category	Category
-	User		User
-	Likes		Likes
-	CreatedAt	time.Time
+	ID				int
+	Title			string
+	Content			string
+	ThumbnailPath 	string
+	Category		Category
+	User			User
+	Likes			Likes
+	CreatedAt		time.Time
 }
 
 type Comment struct {
@@ -47,7 +51,8 @@ type Likes struct {
 type UserStore interface {
 	GetUserByEmail(email string) (*User, error)
 	GetUserByID(id int) (*User, error)
-	CreateUser(User) (int, error)
+	CreateUser(user User) (int, error)
+	UpdateUser(user User) (error)
 }
 
 type BlogStore interface {
@@ -67,4 +72,8 @@ type CommentStore interface {
 	GetCommentLikes(commentID, userID int) (*Likes, error)
 	CreateLike(value, commentID, userID int) (error)
 	UpdateLike(value, commentID, userID int) (error)
+}
+
+type S3Uploader interface {
+	PutObject(file io.Reader, filename, directory string) (string, error)
 }

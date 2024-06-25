@@ -19,8 +19,8 @@ type RegisterFormValues struct {
     PasswordRepeat  string
 }
 
-templ RegisterForm(form *forms.Form) {
-     <form class="grid" hx-post="/user/register" hx-swap="outerHTML">
+templ RegisterFormStep1(form *forms.Form) {
+     <form class="grid" hx-post="/user/register/step1" hx-swap="outerHTML">
         @components.Input(components.InputProps{
             Typ: "text",
             Placeholder: "Username...",
@@ -57,6 +57,26 @@ templ RegisterForm(form *forms.Form) {
     </form>
 }
 
+templ RegisterFormStep2(form *forms.Form) {
+     <form class="grid" enctype="multipart/form-data" hx-post="/user/register/step2" hx-swap="outerHTML">
+        @components.Textarea(components.TextareaProps{
+            Label: "Bio",
+            Name: "bio",
+            Placeholder: "Write something about you",
+            Error: form.Errors.Get("bio"),
+            Value: form.Values.Get("bio"),
+        })
+        @components.Input(components.InputProps{
+            Typ: "file",
+            Label: "Avatar",
+            Name: "avatar",
+            Error: form.Errors.Get("avatar"),
+        })
+        <button class="btn btn--secondary">Save</button>
+        <a href={ templ.URL("/") }>Skip</a>
+    </form>
+}
+
 templ Register(data RegisterData){
     @layouts.Base(data.Title, data.User) {
         <section class="my-24">
@@ -64,7 +84,7 @@ templ Register(data RegisterData){
                 @components.GoBack()
                 <div class="panel flow">
                     <h1 class="heading">Register</h1>
-                    @RegisterForm(data.RegisterForm)
+                    @RegisterFormStep1(data.RegisterForm)
                 </div>
             </div>
         </section>

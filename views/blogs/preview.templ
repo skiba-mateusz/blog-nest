@@ -2,12 +2,13 @@ package blogs
 
 import "fmt"
 import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/config"
 
 templ Preview(blog types.Blog, variant string) {
     <a class={"blog-preview", templ.KV(fmt.Sprintf("blog-preview--%s", variant), variant != "")} href={ templ.URL(fmt.Sprintf("/blog/%d", blog.ID)) }>
         <article class="blog-preview__inner">
             <figure class="blog-preview__img-wrapper backdrop">
-                <img class="blog-preview__img" src="/static/images/blog.jpg" alt={ blog.Title }/>
+                <img class="blog-preview__img" src={ config.Envs.S3BaseUrl + blog.ThumbnailPath } alt={ blog.Title }/>
             </figure>
             <div class="blog-preview__content">
                 <span class="category">{ blog.Category.Name }</span>

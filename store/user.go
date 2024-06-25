@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/skiba-mateusz/blog-nest/types"
@@ -23,7 +25,7 @@ func (s *userStore) GetUserByEmail(email string) (*types.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
 	
-	query := `SELECT id, username, email, password, created_at FROM users WHERE email = $1`
+	query := `SELECT id, username, email, password, avatar_path, created_at FROM users WHERE email = $1`
 	row := s.db.QueryRowContext(ctx, query, email)
 
 	user, err := scanRowIntoUser(row)
@@ -41,7 +43,7 @@ func (s *userStore) GetUserByID(id int) (*types.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
 	
-	query := `SELECT id, username, email, password, created_at FROM users WHERE id = $1`
+	query := `SELECT id, username, email, password, avatar_path, created_at FROM users WHERE id = $1`
 	row := s.db.QueryRowContext(ctx, query, id)
 
 	user, err := scanRowIntoUser(row)
@@ -73,9 +75,46 @@ func (s *userStore) CreateUser(user types.User) (int, error) {
 	return int(id), nil
 }
 
+func (s *userStore) UpdateUser(user types.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	defer cancel()
+
+	updates := []string{}
+	args := []interface{}{}
+	argID := 0
+
+	if user.Bio != "" {
+		argID++
+		updates = append(updates, fmt.Sprintf("bio = $%d", argID))
+		args = append(args, user.Bio)
+	}
+
+	if user.AvatarPath != "" {
+		argID++
+		updates = append(updates, fmt.Sprintf("avatar_path = $%d", argID))
+		args = append(args, user.AvatarPath)
+	}
+
+	if len(updates) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	argID++
+	args = append(args, user.ID)
+	stmt := fmt.Sprintf(`UPDATE users SET %s WHERE id = $%d`, strings.Join(updates, ", "), argID)
+	log.Println(stmt)
+
+	_, err := s.db.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func scanRowIntoUser(row *sql.Row) (*types.User, error) {
 	user := new(types.User)
-	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.AvatarPath, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}

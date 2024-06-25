@@ -45,7 +45,7 @@ func CreateBlogForm(categories []types.Category, form *forms.Form) templ.Compone
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form id=\"create-blog-form\" class=\"grid\" hx-post=\"/blog/create\" hx-trigger=\"create-blog\" hx-swap=\"outerHTML\"><input id=\"create-blog-content\" type=\"hidden\" name=\"content\"> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form id=\"create-blog-form\" class=\"grid\" enctype=\"multipart/form-data\" hx-post=\"/blog/create\" hx-trigger=\"create-blog\" hx-swap=\"outerHTML\"><input id=\"create-blog-content\" type=\"hidden\" name=\"content\"> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -67,6 +67,17 @@ func CreateBlogForm(categories []types.Category, form *forms.Form) templ.Compone
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		templ_7745c5c3_Err = components.Input(components.InputProps{
+			Typ:         "file",
+			Name:        "thumbnail",
+			Label:       "Thumbnail",
+			Placeholder: "",
+			Value:       "",
+			Error:       form.Errors.Get("thumbnail"),
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = components.Input(components.InputProps{
 			Typ:         "text",

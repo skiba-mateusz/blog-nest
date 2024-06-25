@@ -18,13 +18,15 @@ type blogHandler struct {
 	userStore 		types.UserStore
 	blogStore 		types.BlogStore
 	commentStore 	types.CommentStore
+	s3Uploader 		types.S3Uploader
 }
 
-func NewBlogHanlder(userStore types.UserStore, blogStore types.BlogStore, commentStore types.CommentStore) *blogHandler {
+func NewBlogHanlder(userStore types.UserStore, blogStore types.BlogStore, commentStore types.CommentStore, s3Uploader types.S3Uploader) *blogHandler {
 	return &blogHandler{
 		userStore: userStore,
 		blogStore: blogStore,
 		commentStore: commentStore,
+		s3Uploader: s3Uploader,
 	}
 }
 
@@ -136,7 +138,7 @@ func (h *blogHandler) HandleGetBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		utils.ClientError(w, "invalid requesta data", http.StatusBadRequest)
 		return
@@ -159,8 +161,21 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 	form.MinLength("content", 200)
 	form.Required("category", "title")
 
+	file, header, err := r.FormFile("thumbnail")
+	if err != nil {
+		form.Errors.Add("thumbnail", "Thumbnail is required")
+	} else {
+		defer file.Close()
+	}
+
 	if !form.Valid() {
 		utils.Render(w, blogs.CreateBlogForm(categories, form))
+		return
+	}
+
+	s3Key, err := h.s3Uploader.PutObject(file, header.Filename, "thumbnails")
+	if err != nil {
+		utils.ServerError(w, err)
 		return
 	}
 
@@ -173,6 +188,7 @@ func (h *blogHandler) HandleCreateBlog(w http.ResponseWriter, r *http.Request) {
 	blog := types.Blog{
 		Title: form.Values.Get("title"),
 		Content: form.Values.Get("content"),
+		ThumbnailPath: s3Key,
 		Category: types.Category{
 			ID: categoryID,
 		},

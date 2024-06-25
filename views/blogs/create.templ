@@ -23,11 +23,19 @@ func categoriesOptions(categories []types.Category) []components.OptionProps {
 }
 
 templ CreateBlogForm(categories []types.Category, form *forms.Form) {
-    <form id="create-blog-form" class="grid" hx-post="/blog/create" hx-trigger="create-blog" hx-swap="outerHTML">
+    <form id="create-blog-form" class="grid" enctype="multipart/form-data" hx-post="/blog/create" hx-trigger="create-blog" hx-swap="outerHTML">
         <input id="create-blog-content" type="hidden" name="content">
         if len(form.Errors.Get("content")) > 0 {
             <p class="alert" role="alert">{ form.Errors.Get("content") }</p>
         }
+        @components.Input(components.InputProps{
+            Typ: "file",
+            Name: "thumbnail",
+            Label: "Thumbnail",
+            Placeholder: "",
+            Value: "",
+            Error: form.Errors.Get("thumbnail"),
+        })
         @components.Input(components.InputProps{
             Typ: "text",
             Name: "title",

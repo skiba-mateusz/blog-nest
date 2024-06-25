@@ -207,14 +207,17 @@ hr {
   padding: var(--size-8) var(--size-12);
 }
 
-.input {
+.input,
+.textarea {
   width: 100%;
   padding: var(--size-12) var(--size-16);
   border: 1px solid var(--clr-gray-300);
   border-radius: var(--rounded-sm);
+  resize: none;
   outline: none;
 }
-.input:focus {
+.input:focus,
+.textarea:focus {
   border: 1px solid var(--clr-blue-500);
 }
 

@@ -6,6 +6,7 @@ import "github.com/skiba-mateusz/blog-nest/views/components"
 import "github.com/skiba-mateusz/blog-nest/views/comments"
 import "github.com/skiba-mateusz/blog-nest/forms"
 import "github.com/skiba-mateusz/blog-nest/utils"
+import "github.com/skiba-mateusz/blog-nest/config"
 
 
 type IndexData struct {
@@ -24,7 +25,7 @@ templ Index(data IndexData) {
                 <header class="blog__header">
                     <h1 class="blog__title">{ data.Blog.Title }</h1>
                     <figure class="blog__img-wrapper backdrop">
-                        <img class="blog__img" src="/static/images/blog.jpg" alt={ data.Blog.Title }>
+                        <img class="blog__img" src={ config.Envs.S3BaseUrl + data.Blog.ThumbnailPath} alt={ data.Blog.Title }>
                     </figure>
                     <div class="blog__author panel flow">
                         <h2 class="heading text-20 text-semi-bold">About author</h2>

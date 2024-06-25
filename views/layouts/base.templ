@@ -1,12 +1,17 @@
 package layouts
 
 import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/config"
 
 templ userMenu(user *types.User) {
     <div class="menu">
         <button id="user-menu-trigger" class="menu__trigger btn btn--rounded" aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu-list">
             <span class="sr-only">User menu</span>
-            <box-icon name='user'></box-icon>
+            if user.AvatarPath == "" {
+                <box-icon name='user'></box-icon>
+            } else {
+                <img class="avatar" src={ config.Envs.S3BaseUrl + user.AvatarPath }/>
+            }
         </button>
         <div id="user-menu-list" class="menu__list" aria-labeledby="user-menu-trigger" role="menu">
             <header class="menu__header">
@@ -44,7 +49,7 @@ templ header(user *types.User) {
                     <input class="search-box__input" id="search-box-input" name="search_query" type="search" placeholder="Search blogs" required/>
                 </form>
                 @nav()
-                if user != nil {
+                if user.ID != 0 {
                     @userMenu(user)
                 } else {
                     <div class="flex-group">
@@ -71,7 +76,6 @@ templ Base(title string, user *types.User) {
             <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
             <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
             <script src="/static/js/script.js" defer></script>
         </head>
         <body>

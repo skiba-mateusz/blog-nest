@@ -70,7 +70,7 @@ func (s *blogStore) GetBlogs(offset, limit int, searchQuery, category string) ([
 
 	query := `
 		SELECT 
-			b.id, b.title, c.name 
+			b.id, b.title, b.thumbnail_path, c.name 
 		FROM 
 			blogs b
 		INNER JOIN
@@ -99,7 +99,7 @@ func (s *blogStore) GetBlogs(offset, limit int, searchQuery, category string) ([
 
 	for rows.Next() {
 		blog := types.Blog{}
-		err := rows.Scan(&blog.ID, &blog.Title, &blog.Category.Name)
+		err := rows.Scan(&blog.ID, &blog.Title, &blog.ThumbnailPath, &blog.Category.Name)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -115,7 +115,7 @@ func (s *blogStore) GetLatestBlogs() ([]types.Blog, error) {
 
 	query := `
 		SELECT 
-			b.id, b.title,
+			b.id, b.title, b.thumbnail_path,
 			c.name 
 		FROM 
 			blogs b
@@ -134,7 +134,7 @@ func (s *blogStore) GetLatestBlogs() ([]types.Blog, error) {
 
 	for rows.Next() {
 		blog := types.Blog{}
-		err := rows.Scan(&blog.ID, &blog.Title, &blog.Category.Name)
+		err := rows.Scan(&blog.ID, &blog.Title, &blog.ThumbnailPath, &blog.Category.Name)
 		if err != nil {
 			return blogs, err
 		}
@@ -150,7 +150,7 @@ func (s *blogStore) GetBlogByID(blogID, userID int) (*types.Blog, error) {
 
 	query := `
 		SELECT 
-			b.id, b.title, b.content, b.created_at,
+			b.id, b.title, b.content, b.thumbnail_path, b.created_at,
 			u.id, u.username,
 			c.id, c.name,
 			COALESCE(SUM(bl.value),0) AS likes_count,
@@ -197,9 +197,9 @@ func (s *blogStore) CreateBlog(blog types.Blog) (int, error) {
 
 	stmt := `
 		INSERT INTO 
-			blogs (title, content, user_id, category_id) 
+			blogs (title, content, thumbnail_path, user_id, category_id) 
 		VALUES 
-			($1, $2, $3, $4) 
+			($1, $2, $3, $4, $5) 
 		RETURNING 
 			id
 	`
@@ -209,6 +209,7 @@ func (s *blogStore) CreateBlog(blog types.Blog) (int, error) {
 		stmt,
 		blog.Title,
 		blog.Content,
+		blog.ThumbnailPath,
 		blog.User.ID,
 		blog.Category.ID,
 	)
@@ -295,6 +296,7 @@ func scanRowsIntoBlog(rows *sql.Rows) (*types.Blog, error) {
 		&blog.ID, 
 		&blog.Title, 
 		&blog.Content, 
+		&blog.ThumbnailPath,
 		&blog.CreatedAt, 
 		&blog.User.ID, 
 		&blog.User.Username, 

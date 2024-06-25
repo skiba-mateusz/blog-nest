@@ -15,6 +15,9 @@ type Config struct {
 	DBUser 			string
 	JWTExpiration 	int64
 	JWTSecret		string
+	AWSRegion		string
+	S3BucketName	string
+	S3BaseUrl		string
 }
 
 var Envs = initConfig()
@@ -27,6 +30,9 @@ func initConfig() Config {
 		DBPassword: getEnv("DB_PASSWORD", ""),
 		JWTSecret: getEnv("JWT_SECRET", ""),
 		JWTExpiration: getEnvAsInt("JWT_EXPIRATION", 3600 * 24 * 7),
+		AWSRegion: getEnv("AWS_REGION", ""),
+		S3BucketName: getEnv("S3_BUCKET_NAME", ""),
+		S3BaseUrl: getEnv("S3_BASE_URL", ""),
 	}
 }
 
