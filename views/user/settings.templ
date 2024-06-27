@@ -1,0 +1,70 @@
+package user
+
+import "github.com/skiba-mateusz/blog-nest/views/layouts"
+import "github.com/skiba-mateusz/blog-nest/views/components"
+import "github.com/skiba-mateusz/blog-nest/types"
+import "github.com/skiba-mateusz/blog-nest/forms"
+import "github.com/skiba-mateusz/blog-nest/config"
+import "fmt"
+
+type SettingsData struct {
+    Title   string
+    User    *types.User
+    Form    *forms.Form
+}
+
+templ SettingsForm(user *types.User, form *forms.Form) {
+    <form class="grid" enctype="multipart/form-data" hx-put={ fmt.Sprintf("/user/update") } hx-trigger="change from:#avatar, click from:#update-btn" hx-swap="outerHTML">
+        <div class="flex-group">
+            <img class="avatar avatar--small" src={ config.Envs.S3BaseUrl + user.AvatarPath }/>
+            <input id="avatar" name="avatar" class="sr-only file-input" type="file" disabled/>
+            <label for="avatar" class="btn btn--primary">Change Profile Picture</label>
+        </div>
+        @components.Input(components.InputProps{
+            Typ: "text",
+            Label: "Username",
+            Placeholder: "Username",
+            Name: "username",
+            Value: user.Username,
+            Error: form.Errors.Get("username"),
+            Disabled: true,
+        })
+        @components.Textarea(components.TextareaProps{
+            Label: "Bio",
+            Placeholder: "Write something about you...",
+            Value: user.Bio,
+            Name: "bio",
+            Error: form.Errors.Get("bio"),
+            Disabled: true,
+        })
+        if len(form.Values.Get("message")) > 0 {
+            <p>{ form.Values.Get("message") }</p>
+        }
+        <button id="update-btn" class="btn btn--secondary hidden">Update</button>
+    </form>
+}
+
+templ Settings(data SettingsData) {
+    @layouts.Base(data.Title, data.User) {
+        <section class="py-32">
+            <div class="container container--medium">
+                @components.GoBack()
+                <div class="panel flow">
+                    <h1 class="heading">Account settings</h1>
+                    @SettingsForm(data.User, data.Form)
+                    <button id="toggle-changes-btn" type="button" class="btn btn--primary">Make Changes</button>
+                </div>
+            </div>
+        </section>
+        <script>
+            const btn = document.querySelector("#toggle-changes-btn");
+            btn.addEventListener("click", (e) => {
+                console.log(e)
+                const form = e.target.previousElementSibling
+                const inputs = form.querySelectorAll("input, textarea")
+                inputs.forEach(input => input.toggleAttribute("disabled"))
+                form.querySelector("button").classList.toggle("hidden")
+            })
+        </script>
+    }
+}

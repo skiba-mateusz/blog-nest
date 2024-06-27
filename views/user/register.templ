@@ -72,8 +72,10 @@ templ RegisterFormStep2(form *forms.Form) {
             Name: "avatar",
             Error: form.Errors.Get("avatar"),
         })
-        <button class="btn btn--secondary">Save</button>
-        <a href={ templ.URL("/") }>Skip</a>
+        <div class="grid" style="--grid-spacer: var(--size-8)">
+            <button class="btn btn--secondary">Save</button>
+            <a class="btn btn--primary" href={ templ.URL("/") }>Skip</a>
+        </div>
     </form>
 }
 

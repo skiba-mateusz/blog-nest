@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/skiba-mateusz/blog-nest/auth"
 	"github.com/skiba-mateusz/blog-nest/forms"
 	"github.com/skiba-mateusz/blog-nest/types"
@@ -34,6 +38,42 @@ func (h *userHandler) HandleRegisterShow(w http.ResponseWriter, r *http.Request)
 		User: u,
 	}))
 } 
+
+func (h *userHandler) HandleProfileShow(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(chi.URLParam(r, "userID"))
+	if err != nil {
+		utils.ClientError(w, "invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	profile, err := h.userStore.GetProfileByID(userID)
+	if err != nil {
+		utils.ServerError(w, err)
+		return 
+	}
+
+	authUser, _ := auth.GetUserFromContext(r.Context())
+	profile.IsOwner = authUser.ID == userID
+
+	utils.Render(w, user.Profile(user.ProfileData{
+		Title: fmt.Sprintf("%s's Profile | BlogNest", profile.Username),
+		User: authUser,
+		Profile: profile,
+	}))
+}
+
+func (h *userHandler) HandleSettingsShow(w http.ResponseWriter, r *http.Request) {
+	u, ok := auth.GetUserFromContext(r.Context())
+	if !ok {
+		w.Header().Set("HX-Redirect", "/")
+	}
+
+	utils.Render(w, user.Settings(user.SettingsData{
+		Title: "Settings | BlogNest",
+		User: u,
+		Form: &forms.Form{},
+	}))
+}
 
 func (h *userHandler) HandleLoginShow(w http.ResponseWriter, r *http.Request) {
 	u, ok := auth.GetUserFromContext(r.Context())
@@ -142,7 +182,7 @@ func (h *userHandler) HandleRegisterUserStep2(w http.ResponseWriter, r *http.Req
 		Bio: form.Values.Get("bio"),
 	}
 
-	err = h.userStore.UpdateUser(user)
+	_, err = h.userStore.UpdateUser(user)
 	if err != nil {
 		utils.ServerError(w, err)
 		return
@@ -195,6 +235,60 @@ func (h *userHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("HX-Redirect", "/")
+}
+
+func (h *userHandler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.ClientError(w, "invalid request data", http.StatusBadRequest)
+		return
+	}
+
+	authUser, _ := auth.GetUserFromContext(r.Context())
+
+	form := forms.New(r.PostForm)
+	form.Required("username", "bio")
+	form.MaxLength("bio", 200)
+	form.MinLength("username", 4)
+
+	if !form.Valid() {
+		utils.Render(w, user.SettingsForm(authUser, form))
+		return
+	}
+
+	s3Key := ""
+	file, header, err := r.FormFile("avatar")
+	if err != nil {
+		if err == http.ErrMissingFile {
+			log.Println("File is missing")
+		} else {
+			utils.ServerError(w, err)
+			return
+		}
+	}
+	if file != nil {
+		defer file.Close()
+		s3Key, err = h.s3Uploader.PutObject(file, header.Filename, "avatars")
+		if err != nil {
+			utils.ServerError(w, err)
+			return
+		}
+	}
+
+	u := types.User{
+		ID: authUser.ID,
+		Username: form.Values.Get("username"),
+		Email: form.Values.Get("email"),
+		Bio: form.Values.Get("bio"),
+		AvatarPath: s3Key,
+	}
+
+	_, err = h.userStore.UpdateUser(u)
+	if err != nil {
+		utils.ServerError(w, err)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/user/settings")
 }
 
 func (h *userHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {

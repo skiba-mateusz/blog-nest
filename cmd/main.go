@@ -47,9 +47,12 @@ func main() {
 	router.Get("/user/register", userHandler.HandleRegisterShow)
 	router.Get("/user/login", userHandler.HandleLoginShow)
 	router.Get("/user/logout", userHandler.HandleLogout)
+	router.Get("/user/profile/{userID}", userHandler.HandleProfileShow)
+	router.Get("/user/settings", userHandler.HandleSettingsShow)
 	router.Post("/user/register/step1", userHandler.HandleRegisterUserStep1)
 	router.Post("/user/register/step2", userHandler.HandleRegisterUserStep2)
 	router.Post("/user/login", userHandler.HandleLoginUser)
+	router.Put("/user/update", userHandler.HandleUpdate)
 
 	router.Get("/blog/create", blogHandler.HandleCreateShow)
 	router.Get("/blog/{blogID}", blogHandler.HandleBlogShow)

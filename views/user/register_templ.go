@@ -136,7 +136,7 @@ func RegisterFormStep2(form *forms.Form) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"btn btn--secondary\">Save</button> <a href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid\" style=\"--grid-spacer: var(--size-8)\"><button class=\"btn btn--secondary\">Save</button> <a class=\"btn btn--primary\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -145,7 +145,7 @@ func RegisterFormStep2(form *forms.Form) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Skip</a></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Skip</a></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

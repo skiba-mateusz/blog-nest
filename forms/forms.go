@@ -74,6 +74,11 @@ func (f *Form) PasswordsMatch(field, repeatedField string) {
 	}
 }
 
+func (f *Form) Clear() {
+	f.Values = url.Values{}
+	f.Errors = errors{}
+}
+
 func (f *Form) Valid() bool {
 	return len(f.Errors) == 0
 }

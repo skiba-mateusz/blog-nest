@@ -15,6 +15,16 @@ type User struct {
 	CreatedAt	time.Time
 }
 
+type Profile struct {
+	Username	string
+	Bio			string
+	AvatarPath	string
+	NumComments int
+	NumBogs		int
+	IsOwner 	bool
+	CreatedAt	time.Time
+}
+
 type Category struct {
 	ID		int
 	Name	string
@@ -51,8 +61,9 @@ type Likes struct {
 type UserStore interface {
 	GetUserByEmail(email string) (*User, error)
 	GetUserByID(id int) (*User, error)
+	GetProfileByID(id int) (*Profile, error)
 	CreateUser(user User) (int, error)
-	UpdateUser(user User) (error)
+	UpdateUser(user User) (*User, error)
 }
 
 type BlogStore interface {

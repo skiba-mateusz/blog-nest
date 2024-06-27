@@ -2,6 +2,7 @@ package layouts
 
 import "github.com/skiba-mateusz/blog-nest/types"
 import "github.com/skiba-mateusz/blog-nest/config"
+import "fmt"
 
 templ userMenu(user *types.User) {
     <div class="menu">
@@ -10,7 +11,7 @@ templ userMenu(user *types.User) {
             if user.AvatarPath == "" {
                 <box-icon name='user'></box-icon>
             } else {
-                <img class="avatar" src={ config.Envs.S3BaseUrl + user.AvatarPath }/>
+                <img class="avatar avatar--small" src={ config.Envs.S3BaseUrl + user.AvatarPath }/>
             }
         </button>
         <div id="user-menu-list" class="menu__list" aria-labeledby="user-menu-trigger" role="menu">
@@ -18,7 +19,8 @@ templ userMenu(user *types.User) {
                 <span class="text-medium">{ user.Email }</span>
             </header>
             <hr/>
-            <a href={ templ.URL("/user/profile") } class="menu__item" role="menuitem">Profile</a>
+            <a href={ templ.URL(fmt.Sprintf("/user/profile/%d", user.ID)) } class="menu__item" role="menuitem">Profile</a>
+            <a href={ templ.URL("/user/settings") } class="menu__item" role="menuitem">Settings</a>
             <a href={ templ.URL("/user/logout") } class="menu__item" role="menuitem">Logout</a>
         </div>
     </div>
